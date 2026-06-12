@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Predicción del Partido - Predicción Deportiva{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item active">Predicción #{{ match_id }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row" id="prediction-content">
+    <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">Generando predicción...</p>
+    </div>
+</div>
+
+<div class="row g-3 mt-2">
+    <div class="col-md-6">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header border-secondary">
+                <h5 class="mb-0"><i class="bi bi-pie-chart text-primary"></i> Probabilidades</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="probabilityChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header border-secondary">
+                <h5 class="mb-0"><i class="bi bi-graph-up text-success"></i> Distribución de Goles</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="goalDistributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-2">
+    <div class="col-12">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header border-secondary">
+                <h5 class="mb-0"><i class="bi bi-lightbulb text-warning"></i> Explicación de la Predicción</h5>
+            </div>
+            <div class="card-body" id="explanation-content">
+                <p class="text-muted text-center">Cargando explicación...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/prediction.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        loadPrediction({{ match_id }});
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,19 @@
+-r requirements.txt
+
+# Testing
+pytest>=7.4.3
+pytest-cov>=4.1.0
+pytest-xdist>=3.5.0
+pytest-mock>=3.12.0
+
+# Linting & Formatting
+flake8>=6.1.0
+black>=23.11.0
+isort>=5.12.0
+mypy>=1.7.1
+
+# Dev Tools
+ipython>=8.18.1
+jupyter>=1.0.0
+pre-commit>=3.5.0
+memory-profiler>=0.61.0

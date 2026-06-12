@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Predicción Deportiva{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <h1 class="h3 mb-0">
+                <i class="bi bi-trophy text-warning"></i>
+                Próximos Partidos
+            </h1>
+            <span class="badge bg-info fs-6" id="matches-count">Cargando...</span>
+        </div>
+        <p class="text-muted">
+            Predicciones generadas por modelo ensemble híbrido (Poisson + XGBoost + LightGBM + Random Forest)
+        </p>
+    </div>
+</div>
+
+<div class="row" id="match-cards">
+    <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando predicciones...</span>
+        </div>
+        <p class="mt-2 text-muted">Cargando predicciones...</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card bg-dark border-secondary h-100">
+            <div class="card-header border-secondary">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-pie-chart text-primary"></i>
+                    Distribución de Predicciones
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="distributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-dark border-secondary h-100">
+            <div class="card-header border-secondary">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-graph-up text-success"></i>
+                    Confianza Promedio
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="confidenceChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/dashboard.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUpcomingMatches();
+    });
+</script>
+{% endblock %}

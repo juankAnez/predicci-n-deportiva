@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Predicción Deportiva{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3">
+            <i class="bi bi-speedometer2 text-info"></i>
+            Dashboard Analítico
+        </h1>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card bg-dark border-primary">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Precisión Global</h6>
+                <h2 class="text-primary mb-0" id="global-accuracy">--%</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-dark border-success">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Modelo Principal</h6>
+                <h2 class="text-success mb-0" id="best-model">XGBoost</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-dark border-warning">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Partidos Analizados</h6>
+                <h2 class="text-warning mb-0" id="total-matches">--</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-dark border-danger">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Log Loss Promedio</h6>
+                <h2 class="text-danger mb-0" id="avg-log-loss">--</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header border-secondary">
+                <h5 class="mb-0"><i class="bi bi-activity text-primary"></i> Comparativa de Modelos</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="modelComparisonChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header border-secondary">
+                <h5 class="mb-0"><i class="bi bi-check2-circle text-success"></i> Últimas Predicciones</h5>
+            </div>
+            <div class="card-body" id="prediction-history-list">
+                <p class="text-muted text-center">Cargando...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-12">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header border-secondary">
+                <h5 class="mb-0"><i class="bi bi-bar-chart text-info"></i> Evolución de Precisión</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="accuracyTrendChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/dashboard.js"></script>
+<script>document.addEventListener('DOMContentLoaded', loadDashboard);</script>
+{% endblock %}
