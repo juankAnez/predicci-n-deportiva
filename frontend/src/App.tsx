@@ -40,7 +40,7 @@ export const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalMatches, setTotalMatches] = useState<number>(0);
-  const [selectedLeague, setSelectedLeague] = useState<string | undefined>(undefined);
+  const [selectedLeague, setSelectedLeague] = useState<string | undefined>("PD");
   const [statusFilter, setStatusFilter] = useState<"upcoming" | "finished">("upcoming");
 
   // Loaders

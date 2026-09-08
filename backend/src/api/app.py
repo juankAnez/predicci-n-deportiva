@@ -60,6 +60,10 @@ def create_app() -> Flask:
     app.register_blueprint(scraping_bp, url_prefix="/api/v1/admin")
     app.register_blueprint(model_bp, url_prefix="/api/v1/models")
 
+    @app.route("/api/v1/health")
+    def health():
+        return {"status": "success", "message": "SportPredict AI API is operational"}
+
     # Frontend routes (serve HTML pages)
     @app.route("/")
     def index():

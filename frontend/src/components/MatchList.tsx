@@ -92,6 +92,24 @@ export const MatchList: React.FC<MatchListProps> = ({
     return { name: "La Liga", style: "border-amber-500/30 bg-amber-500/10 text-amber-300" };
   };
 
+  const getLeagueDisplayName = (code?: string) => {
+    switch (code) {
+      case "PD": return "La Liga (España)";
+      case "PL": return "Premier League (Inglaterra)";
+      case "SA": return "Serie A (Italia)";
+      case "BL": return "Bundesliga (Alemania)";
+      case "L1": return "Ligue 1 (Francia)";
+      case "UCL": return "UEFA Champions League";
+      case "UEL": return "UEFA Europa League";
+      case "CDR": return "Copa del Rey (España)";
+      case "FAC": return "FA Cup (Inglaterra)";
+      case "CI": return "Coppa Italia (Italia)";
+      case "DFB": return "DFB-Pokal (Alemania)";
+      case "CDF": return "Coupe de France (Francia)";
+      default: return "Todas las Competiciones Europeas";
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-slate-800/80 bg-[#070e1c] p-4 sm:p-5 shadow-lg space-y-4">
       {/* Top Status Tabs: Upcoming vs History */}
@@ -114,7 +132,7 @@ export const MatchList: React.FC<MatchListProps> = ({
                   : "bg-slate-800 text-slate-400"
               }`}
             >
-              {totalMatches > 0 && statusFilter === "upcoming" ? totalMatches : 53}
+              {totalMatches}
             </span>
           </button>
 
@@ -319,6 +337,28 @@ export const MatchList: React.FC<MatchListProps> = ({
             <span>Coupe de France</span>
           </button>
         </div>
+      </div>
+
+      {/* Active Tournament / League Indicator Banner */}
+      <div className="flex items-center justify-between rounded-xl bg-slate-900/90 border border-slate-800/80 px-3.5 py-2 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
+          <span className="font-bold text-white tracking-wide">
+            {getLeagueDisplayName(selectedLeague)}
+          </span>
+          <span className="text-[11px] text-slate-400 font-medium">
+            ({filteredMatches.length} partidos mostrados)
+          </span>
+        </div>
+        {selectedLeague && (
+          <button
+            onClick={() => onSelectLeague(undefined)}
+            className="text-[11px] text-teal-400 hover:text-teal-300 font-semibold transition-colors flex items-center gap-1"
+          >
+            <span>Ver todas las ligas</span>
+            <ArrowRight className="h-3 w-3" />
+          </button>
+        )}
       </div>
 
       {/* Matches Grid */}

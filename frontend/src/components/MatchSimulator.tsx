@@ -68,7 +68,7 @@ const UCL_IDS = new Set([14, 7, 18, 12, 44, 26, 28, 30, 49, 50, 51, 54, 57, 58, 
 const UEL_IDS = new Set([15, 10, 19, 35, 41, 38, 53, 55, 56, 61, 65, 66, 68]);
 
 export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulate }) => {
-  const [simLeague, setSimLeague] = useState<SimLeagueCode>("ALL");
+  const [simLeague, setSimLeague] = useState<SimLeagueCode>("PD");
 
   const getFilteredTeams = (code: SimLeagueCode, allTeams: Team[]) => {
     if (code === "PD" || code === "CDR") {
@@ -109,8 +109,8 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
     }
   };
 
-  const [homeTeamId, setHomeTeamId] = useState<number>(availableTeams[0]?.id || 14);
-  const [awayTeamId, setAwayTeamId] = useState<number>(availableTeams[1]?.id || 7);
+  const [homeTeamId, setHomeTeamId] = useState<number>(14);
+  const [awayTeamId, setAwayTeamId] = useState<number>(7);
   const [hOdds, setHOdds] = useState<string>("2.10");
   const [dOdds, setDOdds] = useState<string>("3.30");
   const [aOdds, setAOdds] = useState<string>("3.50");
@@ -364,18 +364,6 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
               <div className="flex flex-wrap items-center gap-1">
                 <button
                   type="button"
-                  onClick={() => handleSelectSimLeague("ALL")}
-                  className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
-                    simLeague === "ALL"
-                      ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
-                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
-                  }`}
-                >
-                  <Globe className="h-3 w-3" />
-                  <span>Todos ({teams.length})</span>
-                </button>
-                <button
-                  type="button"
                   onClick={() => handleSelectSimLeague("PD")}
                   className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
                     simLeague === "PD"
@@ -433,6 +421,18 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
                 >
                   <Shield className="h-3 w-3 text-indigo-400" />
                   <span>Ligue 1</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSelectSimLeague("ALL")}
+                  className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                    simLeague === "ALL"
+                      ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                  }`}
+                >
+                  <Globe className="h-3 w-3" />
+                  <span>Inter-Liga ({teams.length})</span>
                 </button>
               </div>
             </div>
@@ -550,7 +550,7 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
               >
                 {availableTeams.map((t) => (
                   <option key={t.id} value={t.id} disabled={t.id === awayTeamId}>
-                    {t.name} ({t.country || "Club"})
+                    {t.name} ({t.code ? `${t.code} · ` : ""}{t.country || "Club"})
                   </option>
                 ))}
               </select>
@@ -573,7 +573,7 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
               >
                 {availableTeams.map((t) => (
                   <option key={t.id} value={t.id} disabled={t.id === homeTeamId}>
-                    {t.name} ({t.country || "Club"})
+                    {t.name} ({t.code ? `${t.code} · ` : ""}{t.country || "Club"})
                   </option>
                 ))}
               </select>

@@ -23,6 +23,7 @@ export interface Team {
   name: string;
   full_name?: string;
   short_name?: string;
+  code?: string;
   country?: string;
   league?: string;
   league_code?: string;
