@@ -11,12 +11,53 @@ prediction_repo = PredictionRepository()
 @prediction_bp.route("/<int:match_id>", methods=["GET"])
 def get_prediction(match_id: int):
     try:
-        result = prediction_service.predict_match(match_id)
+        h_odds = request.args.get("h_odds", type=float)
+        d_odds = request.args.get("d_odds", type=float)
+        a_odds = request.args.get("a_odds", type=float)
+        odds = None
+        if h_odds and d_odds and a_odds:
+            from src.domain.value_objects.betting_market import BettingOdds
+            odds = BettingOdds(home_win=h_odds, draw=d_odds, away_win=a_odds)
+
+        result = prediction_service.predict_match(match_id, odds=odds)
         return jsonify({"status": "success", "data": result})
     except ValueError as e:
         return jsonify({"status": "error", "error": str(e)}), 404
     except FileNotFoundError as e:
         return jsonify({"status": "error", "error": str(e)}), 503
+
+
+@prediction_bp.route("/simulate", methods=["GET", "POST"])
+def simulate_match():
+    try:
+        if request.method == "POST":
+            payload = request.get_json() or {}
+            home_team_id = int(payload.get("home_team_id", 0))
+            away_team_id = int(payload.get("away_team_id", 0))
+            h_odds = payload.get("h_odds")
+            d_odds = payload.get("d_odds")
+            a_odds = payload.get("a_odds")
+        else:
+            home_team_id = request.args.get("home_team_id", type=int, default=0)
+            away_team_id = request.args.get("away_team_id", type=int, default=0)
+            h_odds = request.args.get("h_odds", type=float)
+            d_odds = request.args.get("d_odds", type=float)
+            a_odds = request.args.get("a_odds", type=float)
+
+        if not home_team_id or not away_team_id:
+            return jsonify({"status": "error", "error": "home_team_id y away_team_id son requeridos"}), 400
+
+        odds = None
+        if h_odds and d_odds and a_odds:
+            from src.domain.value_objects.betting_market import BettingOdds
+            odds = BettingOdds(home_win=float(h_odds), draw=float(d_odds), away_win=float(a_odds))
+
+        result = prediction_service.predict_teams(home_team_id, away_team_id, odds=odds)
+        return jsonify({"status": "success", "data": result})
+    except ValueError as e:
+        return jsonify({"status": "error", "error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"status": "error", "error": str(e)}), 500
 
 
 @prediction_bp.route("/upcoming", methods=["GET"])

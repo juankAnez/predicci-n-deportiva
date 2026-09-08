@@ -1,10 +1,30 @@
 from flask import Blueprint, jsonify, request
 
-from src.infrastructure.database.repositories import TeamStatsRepository, MatchRepository
+from src.infrastructure.database.repositories import TeamStatsRepository, MatchRepository, TeamRepository
 
 stats_bp = Blueprint("stats", __name__)
 stats_repo = TeamStatsRepository()
 match_repo = MatchRepository()
+team_repo = TeamRepository()
+
+
+@stats_bp.route("/overview", methods=["GET"])
+def get_overview_stats():
+    matches = match_repo.get_all()
+    teams = team_repo.get_all()
+    return jsonify({
+        "status": "success",
+        "data": {
+            "total_matches": len(matches),
+            "total_teams": len(teams),
+            "finished_matches": len([m for m in matches if m.is_finished]),
+            "models_active": 6,
+            "supported_leagues": [
+                {"id": 1, "name": "Premier League", "country": "Inglaterra", "code": "PL"},
+                {"id": 3, "name": "La Liga", "country": "España", "code": "PD"}
+            ]
+        }
+    })
 
 
 @stats_bp.route("/match/<int:match_id>", methods=["GET"])

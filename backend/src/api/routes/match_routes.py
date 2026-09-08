@@ -36,6 +36,8 @@ def list_matches():
     start = (page - 1) * per_page
     matches_page = matches[start:start + per_page]
 
+    teams = {t.id: t.name for t in team_repo.get_all()}
+
     return jsonify({
         "status": "success",
         "data": [
@@ -44,6 +46,8 @@ def list_matches():
                 "date": m.match_date.isoformat() if m.match_date else None,
                 "home_team_id": m.home_team_id,
                 "away_team_id": m.away_team_id,
+                "home_team_name": teams.get(m.home_team_id, f"Team_{m.home_team_id}"),
+                "away_team_name": teams.get(m.away_team_id, f"Team_{m.away_team_id}"),
                 "home_score": m.home_score,
                 "away_score": m.away_score,
                 "stage": m.stage,

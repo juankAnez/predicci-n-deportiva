@@ -15,6 +15,18 @@ build/
 venv/
 env/
 
+# Frontend / Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+*.local
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
 # IDE
 .vscode/
 .idea/
