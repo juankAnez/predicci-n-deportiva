@@ -30,15 +30,15 @@ interface MatchSimulatorProps {
 const getPosBadge = (pos: string) => {
   switch (pos?.toUpperCase()) {
     case "GK":
-      return "bg-amber-50 text-amber-800 border-amber-200";
+      return "bg-amber-500/20 text-amber-300 border-amber-500/30";
     case "DF":
-      return "bg-sky-50 text-sky-800 border-sky-200";
+      return "bg-sky-500/20 text-sky-300 border-sky-500/30";
     case "MF":
-      return "bg-emerald-50 text-emerald-800 border-emerald-200";
+      return "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
     case "FW":
-      return "bg-rose-50 text-rose-800 border-rose-200";
+      return "bg-rose-500/20 text-rose-300 border-rose-500/30";
     default:
-      return "bg-slate-100 text-slate-700 border-slate-200";
+      return "bg-slate-800 text-slate-300 border-slate-700";
   }
 };
 
@@ -49,24 +49,29 @@ const formatMarketVal = (eur: number) => {
 };
 
 export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulate }) => {
-  const [simLeague, setSimLeague] = useState<"ALL" | "PD" | "PL">("ALL");
+  const [simLeague, setSimLeague] = useState<"ALL" | "PD" | "PL" | "SA" | "BL" | "L1">("ALL");
 
   const availableTeams = useMemo(() => {
     if (simLeague === "PD") {
-      return teams.filter(
-        (t) => t.country === "Spain" || t.league_code === "PD" || (t.id <= 24 && !t.country)
-      );
+      return teams.filter((t) => t.country === "Spain" || t.league_code === "PD");
     }
     if (simLeague === "PL") {
-      return teams.filter(
-        (t) => t.country === "England" || t.league_code === "PL" || (t.id > 24 && !t.country)
-      );
+      return teams.filter((t) => t.country === "England" || t.league_code === "PL");
+    }
+    if (simLeague === "SA") {
+      return teams.filter((t) => t.country === "Italy" || t.league_code === "SA");
+    }
+    if (simLeague === "BL") {
+      return teams.filter((t) => t.country === "Germany" || t.league_code === "BL");
+    }
+    if (simLeague === "L1") {
+      return teams.filter((t) => t.country === "France" || t.league_code === "L1");
     }
     return teams;
   }, [teams, simLeague]);
 
-  const [homeTeamId, setHomeTeamId] = useState<number>(availableTeams[0]?.id || 1);
-  const [awayTeamId, setAwayTeamId] = useState<number>(availableTeams[1]?.id || 2);
+  const [homeTeamId, setHomeTeamId] = useState<number>(availableTeams[0]?.id || 14);
+  const [awayTeamId, setAwayTeamId] = useState<number>(availableTeams[1]?.id || 7);
   const [hOdds, setHOdds] = useState<string>("2.10");
   const [dOdds, setDOdds] = useState<string>("3.30");
   const [aOdds, setAOdds] = useState<string>("3.50");
@@ -196,8 +201,10 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
     aName: string,
     hO: string,
     dO: string,
-    aO: string
+    aO: string,
+    leagueCode?: "ALL" | "PD" | "PL" | "SA" | "BL" | "L1"
   ) => {
+    if (leagueCode) setSimLeague(leagueCode);
     const hId = findTeamId(hName);
     const aId = findTeamId(aName);
     if (hId && aId) {
@@ -226,76 +233,83 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
   return (
     <div className="space-y-6">
       {/* Simulator Control Panel */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4">
+      <div className="rounded-2xl border border-slate-800/80 bg-[#070e1c] p-5 sm:p-6 shadow-lg">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800/70 pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="rounded-xl bg-blue-50 p-2 text-blue-600 border border-blue-100">
+            <div className="rounded-xl bg-teal-500/10 p-2 text-teal-400 border border-teal-500/20">
               <SlidersHorizontal className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">
-                Simulador Táctico & Calculadora de Valor (+EV)
+              <h2 className="text-base sm:text-lg font-bold text-white">
+                Simulador Táctico Europeo & Calculadora +EV
               </h2>
-              <p className="text-xs text-slate-500 font-medium">
-                Enfrenta dos clubes cualesquiera, gestiona bajas tácticas y obtén inferencia en tiempo real
+              <p className="text-xs text-slate-400 font-medium">
+                Enfrenta clubes de las 5 Grandes Ligas y Champions, gestiona bajas y obtén inferencia en tiempo real
               </p>
             </div>
           </div>
 
           {/* Quick Presets */}
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-slate-400 mr-1">Partidos Clásicos:</span>
+            <span className="text-xs font-semibold text-slate-500 mr-1">Clásicos:</span>
             <button
               type="button"
-              onClick={() => {
-                setSimLeague("PD");
-                handleSetPreset("Real Madrid", "Barcelona", "2.15", "3.60", "3.20");
-              }}
-              className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-all"
+              onClick={() => handleSetPreset("Real Madrid", "Barcelona", "2.15", "3.60", "3.20", "PD")}
+              className="flex items-center gap-1 rounded-lg border border-slate-800 bg-[#091120] px-2.5 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
             >
-              <Zap className="h-3 w-3 text-amber-500" />
+              <Zap className="h-3 w-3 text-amber-400" />
               <span>Madrid vs Barça</span>
             </button>
             <button
               type="button"
-              onClick={() => {
-                setSimLeague("PL");
-                handleSetPreset("Arsenal", "Man City", "2.40", "3.40", "2.90");
-              }}
-              className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-all"
+              onClick={() => handleSetPreset("Arsenal", "Man City", "2.40", "3.40", "2.90", "PL")}
+              className="flex items-center gap-1 rounded-lg border border-slate-800 bg-[#091120] px-2.5 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
             >
-              <Zap className="h-3 w-3 text-blue-500" />
+              <Zap className="h-3 w-3 text-cyan-400" />
               <span>Arsenal vs City</span>
             </button>
             <button
               type="button"
-              onClick={() => {
-                setSimLeague("PL");
-                handleSetPreset("Liverpool", "Man City", "2.50", "3.50", "2.75");
-              }}
-              className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-all"
+              onClick={() => handleSetPreset("Inter", "AC Milan", "2.10", "3.40", "3.50", "SA")}
+              className="flex items-center gap-1 rounded-lg border border-slate-800 bg-[#091120] px-2.5 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
             >
-              <Zap className="h-3 w-3 text-indigo-500" />
-              <span>Liverpool vs City</span>
+              <Zap className="h-3 w-3 text-blue-400" />
+              <span>Inter vs Milan</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSetPreset("Bayern", "Dortmund", "1.75", "4.20", "4.50", "BL")}
+              className="flex items-center gap-1 rounded-lg border border-slate-800 bg-[#091120] px-2.5 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
+            >
+              <Zap className="h-3 w-3 text-rose-400" />
+              <span>Bayern vs BVB</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSetPreset("Paris", "Marsella", "1.50", "4.50", "6.20", "L1")}
+              className="flex items-center gap-1 rounded-lg border border-slate-800 bg-[#091120] px-2.5 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
+            >
+              <Zap className="h-3 w-3 text-indigo-400" />
+              <span>PSG vs OM</span>
             </button>
           </div>
         </div>
 
         {/* Simulation Form */}
-        <form onSubmit={handleSimulate} className="mt-5 space-y-5">
+        <form onSubmit={handleSimulate} className="mt-5 space-y-4">
           {/* League Filter Toggle */}
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-50 p-2 border border-slate-200">
-            <span className="text-xs font-bold text-slate-600 pl-1">
-              Competición para los clubes:
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-900/80 p-2 border border-slate-800">
+            <span className="text-xs font-bold text-slate-400 pl-1">
+              Filtrar clubes por liga:
             </span>
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1">
               <button
                 type="button"
                 onClick={() => setSimLeague("ALL")}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
                   simLeague === "ALL"
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "text-slate-600 hover:bg-slate-200/60"
+                    ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
                 }`}
               >
                 <Globe className="h-3 w-3" />
@@ -304,26 +318,62 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
               <button
                 type="button"
                 onClick={() => setSimLeague("PD")}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
                   simLeague === "PD"
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "text-slate-600 hover:bg-slate-200/60"
+                    ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
                 }`}
               >
-                <Shield className="h-3 w-3 text-amber-500" />
-                <span>LaLiga (24)</span>
+                <Shield className="h-3 w-3 text-amber-400" />
+                <span>La Liga</span>
               </button>
               <button
                 type="button"
                 onClick={() => setSimLeague("PL")}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
                   simLeague === "PL"
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "text-slate-600 hover:bg-slate-200/60"
+                    ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
                 }`}
               >
-                <Shield className="h-3 w-3 text-blue-500" />
-                <span>Premier League (24)</span>
+                <Shield className="h-3 w-3 text-cyan-400" />
+                <span>Premier</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSimLeague("SA")}
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                  simLeague === "SA"
+                    ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                }`}
+              >
+                <Shield className="h-3 w-3 text-blue-400" />
+                <span>Serie A</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSimLeague("BL")}
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                  simLeague === "BL"
+                    ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                }`}
+              >
+                <Shield className="h-3 w-3 text-rose-400" />
+                <span>Bundesliga</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSimLeague("L1")}
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                  simLeague === "L1"
+                    ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                }`}
+              >
+                <Shield className="h-3 w-3 text-indigo-400" />
+                <span>Ligue 1</span>
               </button>
             </div>
           </div>
@@ -331,19 +381,19 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
           {/* Team Selectors */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Home Team */}
-            <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+            <div className="rounded-xl border border-slate-800 bg-[#091120] p-4">
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-bold text-blue-900 uppercase tracking-wider">
+                <label className="text-xs font-bold text-teal-400 uppercase tracking-wider">
                   Club Local
                 </label>
-                <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                <span className="text-[11px] font-bold text-teal-300 bg-teal-500/10 px-2 py-0.5 rounded-md border border-teal-500/20">
                   Rating: {homeAvgRating}
                 </span>
               </div>
               <select
                 value={homeTeamId}
                 onChange={(e) => setHomeTeamId(Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs sm:text-sm font-semibold text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-full rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs sm:text-sm font-semibold text-white focus:border-teal-500 focus:outline-none"
               >
                 {availableTeams.map((t) => (
                   <option key={t.id} value={t.id} disabled={t.id === awayTeamId}>
@@ -354,19 +404,19 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
             </div>
 
             {/* Away Team */}
-            <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+            <div className="rounded-xl border border-slate-800 bg-[#091120] p-4">
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-bold text-indigo-900 uppercase tracking-wider">
+                <label className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
                   Club Visitante
                 </label>
-                <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
+                <span className="text-[11px] font-bold text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded-md border border-cyan-500/20">
                   Rating: {awayAvgRating}
                 </span>
               </div>
               <select
                 value={awayTeamId}
                 onChange={(e) => setAwayTeamId(Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs sm:text-sm font-semibold text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-full rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs sm:text-sm font-semibold text-white focus:border-teal-500 focus:outline-none"
               >
                 {availableTeams.map((t) => (
                   <option key={t.id} value={t.id} disabled={t.id === homeTeamId}>
@@ -378,28 +428,28 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
           </div>
 
           {/* Lineup & Player Absences Manager */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
+          <div className="rounded-2xl border border-slate-800/80 bg-[#070e1c] p-4 sm:p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800/70 pb-3">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-blue-600" />
-                <h3 className="text-sm font-bold text-slate-900">
+                <Users className="h-4 w-4 text-teal-400" />
+                <h3 className="text-sm font-bold text-white">
                   Alineaciones & Simulación de Bajas
                 </h3>
-                <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full border border-slate-200 font-medium">
+                <span className="text-[10px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded-full border border-slate-800 font-medium">
                   Haz clic en un jugador para simular su ausencia
                 </span>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="text-xs text-slate-600">
+                <div className="text-xs text-slate-400">
                   Diferencial:{" "}
                   <strong
                     className={
                       parseFloat(ratingDiff) > 0
-                        ? "text-emerald-600"
+                        ? "text-teal-400"
                         : parseFloat(ratingDiff) < 0
-                        ? "text-rose-600"
-                        : "text-slate-700"
+                        ? "text-rose-400"
+                        : "text-slate-300"
                     }
                   >
                     {parseFloat(ratingDiff) > 0 ? `+${ratingDiff}` : ratingDiff} pts
@@ -408,7 +458,7 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
                 <button
                   type="button"
                   onClick={() => setShowLineups(!showLineups)}
-                  className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 font-medium"
+                  className="flex items-center gap-1 text-xs text-slate-400 hover:text-white font-medium"
                 >
                   {showLineups ? (
                     <>
@@ -424,8 +474,8 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
             </div>
 
             {loadingSquads ? (
-              <div className="flex h-28 items-center justify-center gap-2 text-xs text-slate-500">
-                <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+              <div className="flex h-28 items-center justify-center gap-2 text-xs text-slate-400">
+                <Loader2 className="h-4 w-4 animate-spin text-teal-400" />
                 <span>Cargando plantillas...</span>
               </div>
             ) : showLineups ? (
@@ -433,14 +483,14 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
                 {/* Home Team Squad */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-white">
                       {homeTeamObj?.name} ({homeActive.length}/{homeSquad.length} disponibles)
                     </span>
                     {benchedHome.length > 0 && (
                       <button
                         type="button"
                         onClick={() => setBenchedHome([])}
-                        className="text-[11px] text-blue-600 hover:underline font-medium"
+                        className="text-[11px] text-teal-400 hover:underline font-medium"
                       >
                         Restablecer todos
                       </button>
@@ -455,8 +505,8 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
                           onClick={() => toggleBenchHome(p.id)}
                           className={`cursor-pointer rounded-xl border p-2 transition-all text-xs select-none ${
                             isBenched
-                              ? "border-rose-200 bg-rose-50/50 opacity-60 line-through text-slate-400"
-                              : "border-slate-200 bg-slate-50 hover:border-blue-400 hover:bg-blue-50/30 text-slate-900"
+                              ? "border-rose-900/40 bg-rose-950/20 opacity-50 line-through text-slate-500"
+                              : "border-slate-800 bg-[#091120] hover:border-teal-500/50 text-white"
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -471,18 +521,18 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
                               <span className="font-semibold truncate max-w-[100px]">{p.name}</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <span className="font-bold text-slate-700 flex items-center gap-0.5">
-                                <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                              <span className="font-bold text-slate-300 flex items-center gap-0.5">
+                                <Star className="h-2.5 w-2.5 text-amber-400 fill-amber-400" />
                                 {p.rating?.toFixed(1)}
                               </span>
                               {isBenched ? (
-                                <UserX className="h-3 w-3 text-rose-600" />
+                                <UserX className="h-3 w-3 text-rose-400" />
                               ) : (
-                                <UserCheck className="h-3 w-3 text-emerald-600" />
+                                <UserCheck className="h-3 w-3 text-teal-400" />
                               )}
                             </div>
                           </div>
-                          <div className="mt-1 flex items-center justify-between text-[10px] text-slate-500">
+                          <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
                             <span>{formatMarketVal(p.market_value_eur)}</span>
                             <span>
                               {p.goals}G · {p.assists}A
@@ -497,14 +547,14 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
                 {/* Away Team Squad */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-white">
                       {awayTeamObj?.name} ({awayActive.length}/{awaySquad.length} disponibles)
                     </span>
                     {benchedAway.length > 0 && (
                       <button
                         type="button"
                         onClick={() => setBenchedAway([])}
-                        className="text-[11px] text-indigo-600 hover:underline font-medium"
+                        className="text-[11px] text-cyan-400 hover:underline font-medium"
                       >
                         Restablecer todos
                       </button>
@@ -519,8 +569,8 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
                           onClick={() => toggleBenchAway(p.id)}
                           className={`cursor-pointer rounded-xl border p-2 transition-all text-xs select-none ${
                             isBenched
-                              ? "border-rose-200 bg-rose-50/50 opacity-60 line-through text-slate-400"
-                              : "border-slate-200 bg-slate-50 hover:border-indigo-400 hover:bg-indigo-50/30 text-slate-900"
+                              ? "border-rose-900/40 bg-rose-950/20 opacity-50 line-through text-slate-500"
+                              : "border-slate-800 bg-[#091120] hover:border-cyan-500/50 text-white"
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -535,18 +585,18 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
                               <span className="font-semibold truncate max-w-[100px]">{p.name}</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <span className="font-bold text-slate-700 flex items-center gap-0.5">
-                                <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                              <span className="font-bold text-slate-300 flex items-center gap-0.5">
+                                <Star className="h-2.5 w-2.5 text-amber-400 fill-amber-400" />
                                 {p.rating?.toFixed(1)}
                               </span>
                               {isBenched ? (
-                                <UserX className="h-3 w-3 text-rose-600" />
+                                <UserX className="h-3 w-3 text-rose-400" />
                               ) : (
-                                <UserCheck className="h-3 w-3 text-emerald-600" />
+                                <UserCheck className="h-3 w-3 text-teal-400" />
                               )}
                             </div>
                           </div>
-                          <div className="mt-1 flex items-center justify-between text-[10px] text-slate-500">
+                          <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
                             <span>{formatMarketVal(p.market_value_eur)}</span>
                             <span>
                               {p.goals}G · {p.assists}A
@@ -562,13 +612,13 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
           </div>
 
           {/* Bookmaker Odds Inputs */}
-          <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-            <span className="text-xs font-bold text-slate-700 block mb-2.5">
+          <div className="rounded-xl border border-slate-800 bg-[#091120] p-4">
+            <span className="text-xs font-bold text-slate-300 block mb-2.5">
               Cuotas de tu Casa de Apuestas:
             </span>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <div>
-                <label className="text-[11px] text-slate-600 block mb-1 font-semibold">
+                <label className="text-[11px] text-slate-400 block mb-1 font-semibold">
                   1 · Victoria Local
                 </label>
                 <input
@@ -577,13 +627,13 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
                   min="1.01"
                   value={hOdds}
                   onChange={(e) => setHOdds(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-900 focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-800 bg-slate-900/90 px-3 py-1.5 text-xs font-bold text-white focus:border-teal-500 focus:outline-none"
                   placeholder="Ej. 2.10"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] text-slate-600 block mb-1 font-semibold">
+                <label className="text-[11px] text-slate-400 block mb-1 font-semibold">
                   X · Empate
                 </label>
                 <input
@@ -592,13 +642,13 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
                   min="1.01"
                   value={dOdds}
                   onChange={(e) => setDOdds(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-900 focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-800 bg-slate-900/90 px-3 py-1.5 text-xs font-bold text-white focus:border-teal-500 focus:outline-none"
                   placeholder="Ej. 3.30"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] text-slate-600 block mb-1 font-semibold">
+                <label className="text-[11px] text-slate-400 block mb-1 font-semibold">
                   2 · Victoria Visitante
                 </label>
                 <input
@@ -607,7 +657,7 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
                   min="1.01"
                   value={aOdds}
                   onChange={(e) => setAOdds(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-900 focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-800 bg-slate-900/90 px-3 py-1.5 text-xs font-bold text-white focus:border-teal-500 focus:outline-none"
                   placeholder="Ej. 3.50"
                 />
               </div>
@@ -615,7 +665,7 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
           </div>
 
           {error && (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 font-medium">
+            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-300 font-medium">
               {error}
             </div>
           )}
@@ -624,12 +674,12 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow-sm hover:bg-blue-700 transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-teal-500 py-3 text-sm font-black text-slate-950 shadow-lg shadow-teal-500/20 hover:bg-teal-400 transition-all disabled:opacity-50"
           >
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Simulando enfrentamiento con Ensamble de IA...</span>
+                <span>Simulando con Ensamble de IA...</span>
               </>
             ) : (
               <>
@@ -645,8 +695,8 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
       {simResult && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-slate-900">Resultado de la Simulación</h3>
-            <span className="text-xs text-blue-700 font-semibold bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
+            <h3 className="text-base font-bold text-white">Resultado de la Simulación</h3>
+            <span className="text-xs text-teal-300 font-semibold bg-teal-500/10 border border-teal-500/20 px-2.5 py-0.5 rounded-full">
               Inferencia en Tiempo Real
             </span>
           </div>

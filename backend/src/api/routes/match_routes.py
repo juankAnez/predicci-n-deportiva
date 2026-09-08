@@ -32,13 +32,53 @@ DEFAULT_MATCH_ODDS = {
     (10, 18): {"h": 2.90, "d": 3.20, "a": 2.55},  # Sociedad vs Ath Madrid
     (12, 7):  {"h": 3.90, "d": 3.90, "a": 1.85},  # Girona vs Barcelona
     (1, 4):   {"h": 1.95, "d": 3.30, "a": 4.20},  # Osasuna vs Espanol
+
+    # Serie A (Jornada 4: Sept 12-14, 2026)
+    (50, 56): {"h": 1.75, "d": 3.60, "a": 4.80},  # AC Milan vs Fiorentina
+    (51, 53): {"h": 2.10, "d": 3.25, "a": 3.60},  # Juventus vs AS Roma
+    (54, 55): {"h": 2.05, "d": 3.40, "a": 3.70},  # Atalanta vs Lazio
+    (52, 49): {"h": 2.80, "d": 3.30, "a": 2.50},  # Napoli vs Inter
+
+    # Bundesliga (Jornada 3: Sept 12-14, 2026)
+    (58, 61): {"h": 1.65, "d": 4.20, "a": 4.80},  # Dortmund vs Frankfurt
+    (59, 62): {"h": 1.50, "d": 4.50, "a": 6.00},  # Leverkusen vs Stuttgart
+    (60, 57): {"h": 3.40, "d": 3.90, "a": 2.00},  # Leipzig vs Bayern
+
+    # Ligue 1 (Jornada 4: Sept 12-14, 2026)
+    (65, 66): {"h": 2.00, "d": 3.60, "a": 3.50},  # Marsella vs Lyon
+    (64, 67): {"h": 2.15, "d": 3.40, "a": 3.30},  # Monaco vs Lille
+    (63, 68): {"h": 1.35, "d": 5.20, "a": 8.50},  # PSG vs Rennes
+
+    # UEFA Champions League (Fase de Liga - J1)
+    (14, 57): {"h": 2.25, "d": 3.60, "a": 3.00},  # Real Madrid vs Bayern
+    (44, 49): {"h": 1.55, "d": 4.20, "a": 5.80},  # Man City vs Inter
+    (50, 28): {"h": 3.50, "d": 3.60, "a": 2.05},  # Milan vs Liverpool
+    (26, 59): {"h": 2.05, "d": 3.50, "a": 3.50},  # Arsenal vs Leverkusen
+    (7, 63):  {"h": 2.30, "d": 3.70, "a": 2.85},  # Barcelona vs PSG
+    (51, 58): {"h": 2.10, "d": 3.40, "a": 3.40},  # Juventus vs Dortmund
 }
 
 
 def get_league_info(competition_id):
-    if competition_id in (4, 5, 6):
-        return {"league": "Premier League", "league_code": "PL", "country": "England"}
-    return {"league": "La Liga", "league_code": "PD", "country": "Spain"}
+    comp_map = {
+        1: {"league": "La Liga", "league_code": "PD", "country": "Spain"},
+        2: {"league": "La Liga", "league_code": "PD", "country": "Spain"},
+        3: {"league": "La Liga", "league_code": "PD", "country": "Spain"},
+        4: {"league": "Premier League", "league_code": "PL", "country": "England"},
+        5: {"league": "Premier League", "league_code": "PL", "country": "England"},
+        6: {"league": "Premier League", "league_code": "PL", "country": "England"},
+        7: {"league": "Serie A", "league_code": "SA", "country": "Italy"},
+        8: {"league": "Bundesliga", "league_code": "BL", "country": "Germany"},
+        9: {"league": "Ligue 1", "league_code": "L1", "country": "France"},
+        10: {"league": "Champions League", "league_code": "UCL", "country": "Europe"},
+        11: {"league": "Europa League", "league_code": "UEL", "country": "Europe"},
+        12: {"league": "Copa del Rey", "league_code": "CDR", "country": "Spain"},
+        13: {"league": "FA Cup", "league_code": "FAC", "country": "England"},
+        14: {"league": "Coppa Italia", "league_code": "CI", "country": "Italy"},
+        15: {"league": "DFB-Pokal", "league_code": "DFB", "country": "Germany"},
+        16: {"league": "Coupe de France", "league_code": "CDF", "country": "France"},
+    }
+    return comp_map.get(competition_id, {"league": "La Liga", "league_code": "PD", "country": "Spain"})
 
 
 @match_bp.route("", methods=["GET"])
@@ -60,9 +100,19 @@ def list_matches():
     if league:
         l_upper = league.strip().upper()
         if l_upper in ("PL", "PREMIER", "PREMIER LEAGUE", "ENG_PL", "ENGLAND"):
-            matches = [m for m in matches if m.competition_id in (4, 5, 6)]
+            matches = [m for m in matches if m.competition_id in (4, 5, 6, 13)]
         elif l_upper in ("PD", "LIGA", "LA LIGA", "ESP_L1", "SPAIN"):
-            matches = [m for m in matches if m.competition_id in (1, 2, 3)]
+            matches = [m for m in matches if m.competition_id in (1, 2, 3, 12)]
+        elif l_upper in ("SA", "SERIE A", "SERIE_A", "ITA_SA", "ITALY"):
+            matches = [m for m in matches if m.competition_id in (7, 14)]
+        elif l_upper in ("BL", "BUNDESLIGA", "GER_BL", "GERMANY"):
+            matches = [m for m in matches if m.competition_id in (8, 15)]
+        elif l_upper in ("L1", "LIGUE 1", "LIGUE_1", "FRA_L1", "FRANCE"):
+            matches = [m for m in matches if m.competition_id in (9, 16)]
+        elif l_upper in ("UCL", "CHAMPIONS", "CHAMPIONS LEAGUE", "UEFA_CL"):
+            matches = [m for m in matches if m.competition_id == 10]
+        elif l_upper in ("UEL", "EUROPA", "EUROPA LEAGUE", "UEFA_EL"):
+            matches = [m for m in matches if m.competition_id == 11]
     elif competition_id:
         matches = [m for m in matches if m.competition_id == competition_id]
 

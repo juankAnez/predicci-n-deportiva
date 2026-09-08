@@ -27,8 +27,27 @@ def list_teams():
             teams = [t for t in teams if t.country == "England"]
         elif l_upper in ("PD", "LIGA", "LA LIGA", "ESP_L1", "SPAIN"):
             teams = [t for t in teams if t.country == "Spain"]
+        elif l_upper in ("SA", "SERIE A", "SERIE_A", "ITA_SA", "ITALY"):
+            teams = [t for t in teams if t.country == "Italy"]
+        elif l_upper in ("BL", "BUNDESLIGA", "GER_BL", "GERMANY"):
+            teams = [t for t in teams if t.country == "Germany"]
+        elif l_upper in ("L1", "LIGUE 1", "LIGUE_1", "FRA_L1", "FRANCE"):
+            teams = [t for t in teams if t.country == "France"]
     elif country:
         teams = [t for t in teams if t.country and t.country.lower() == country.strip().lower()]
+
+    def _get_league(c):
+        if c == "England":
+            return "Premier League", "PL"
+        elif c == "Spain":
+            return "La Liga", "PD"
+        elif c == "Italy":
+            return "Serie A", "SA"
+        elif c == "Germany":
+            return "Bundesliga", "BL"
+        elif c == "France":
+            return "Ligue 1", "L1"
+        return "Europa", "EU"
 
     teams.sort(key=lambda t: t.name)
 
@@ -42,8 +61,8 @@ def list_teams():
                 "code": t.code,
                 "country": t.country,
                 "confederation": t.confederation,
-                "league": "Premier League" if t.country == "England" else "La Liga",
-                "league_code": "PL" if t.country == "England" else "PD",
+                "league": _get_league(t.country)[0],
+                "league_code": _get_league(t.country)[1],
                 "logo_url": t.logo_url,
             }
             for t in teams

@@ -156,7 +156,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-[#030712] text-slate-100 selection:bg-teal-500 selection:text-slate-950">
       {/* Navigation */}
       <Navbar
         activeTab={activeTab}
@@ -167,23 +167,23 @@ export const App: React.FC = () => {
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6">
         {/* Crisp Header Title & Description (Immediate Context) */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-800/80 bg-[#070e1c] p-5 sm:p-6 shadow-xl">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200/60 mb-2">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-teal-500/10 px-2.5 py-1 text-xs font-bold text-teal-400 border border-teal-500/30 mb-2">
                 Inteligencia Cuantitativa de Apuestas
               </span>
-              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
                 Pronósticos Basados en IA & Detección de Valor (+EV)
               </h1>
-              <p className="mt-1 text-xs sm:text-sm text-slate-600 max-w-3xl">
-                Ensamble probabilístico de 5 algoritmos entrenados con 89 variables, ratings de 528 jugadores y Poisson bivariado para calcular probabilidades reales y superar las cuotas del mercado.
+              <p className="mt-1 text-xs sm:text-sm text-slate-400 max-w-3xl">
+                Ensamble probabilístico de 5 algoritmos entrenados con 89 variables estadísticas, ratings de más de 600 jugadores y Poisson bivariado para proyectar resultados en las 5 Grandes Ligas y Champions League.
               </p>
             </div>
-            <div className="hidden lg:flex items-center gap-2">
+            <div className="hidden lg:flex items-center gap-3">
               <div className="text-right text-xs">
-                <span className="text-slate-400 block font-medium">Ligas Calibradas</span>
-                <strong className="text-slate-900">LaLiga & Premier League</strong>
+                <span className="text-slate-400 block font-medium">Competiciones Calibradas</span>
+                <strong className="text-teal-300">España · Inglaterra · Italia · Alemania · Francia · UCL</strong>
               </div>
             </div>
           </div>
@@ -253,13 +253,13 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
+      <footer className="mt-16 border-t border-slate-800/80 bg-[#050a14] py-6 text-center text-xs text-slate-400">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-1">
-          <p className="font-semibold text-slate-700">
+          <p className="font-semibold text-slate-300">
             SportPredict AI · Sistema Cuantitativo de Inferencia Deportiva
           </p>
-          <p className="text-slate-500">
-            Conectado a SQLite / PostgreSQL local. Calibración probabilística con árboles XGBoost, LightGBM y Poisson.
+          <p className="text-slate-400">
+            Modelos calibrados para La Liga, Premier League, Serie A, Bundesliga, Ligue 1 y Champions League.
           </p>
         </div>
       </footer>

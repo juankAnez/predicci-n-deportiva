@@ -24,8 +24,13 @@ def get_overview_stats():
             "upcoming_matches": upcoming_count,
             "models_active": 6,
             "supported_leagues": [
+                {"id": "PD", "name": "La Liga", "country": "España", "code": "PD"},
                 {"id": "PL", "name": "Premier League", "country": "Inglaterra", "code": "PL"},
-                {"id": "PD", "name": "La Liga", "country": "España", "code": "PD"}
+                {"id": "SA", "name": "Serie A", "country": "Italia", "code": "SA"},
+                {"id": "BL", "name": "Bundesliga", "country": "Alemania", "code": "BL"},
+                {"id": "L1", "name": "Ligue 1", "country": "Francia", "code": "L1"},
+                {"id": "UCL", "name": "Champions League", "country": "Europa", "code": "UCL"},
+                {"id": "UEL", "name": "Europa League", "country": "Europa", "code": "UEL"},
             ]
         }
     })
