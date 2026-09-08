@@ -237,3 +237,4 @@ sequenceDiagram
 | **Frontend** | React 18 + TypeScript | Interfaz moderna, reactiva y tipada estrictamente con control de errores (*ErrorBoundary*). |
 | **Estilos & UI** | Tailwind CSS + Lucide React | Diseño visual estilo terminal cuantitativa profesional, responsivo y modo oscuro. |
 | **Herramienta de Compilación** | Vite | Empaquetado optimizado del cliente web con recarga en caliente en milisegundos. |
+

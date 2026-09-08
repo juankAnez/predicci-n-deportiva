@@ -156,7 +156,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-slate-950">
+    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white">
       {/* Navigation */}
       <Navbar
         activeTab={activeTab}
@@ -166,6 +166,29 @@ export const App: React.FC = () => {
 
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6">
+        {/* Crisp Header Title & Description (Immediate Context) */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200/60 mb-2">
+                Inteligencia Cuantitativa de Apuestas
+              </span>
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
+                Pronósticos Basados en IA & Detección de Valor (+EV)
+              </h1>
+              <p className="mt-1 text-xs sm:text-sm text-slate-600 max-w-3xl">
+                Ensamble probabilístico de 5 algoritmos entrenados con 89 variables, ratings de 528 jugadores y Poisson bivariado para calcular probabilidades reales y superar las cuotas del mercado.
+              </p>
+            </div>
+            <div className="hidden lg:flex items-center gap-2">
+              <div className="text-right text-xs">
+                <span className="text-slate-400 block font-medium">Ligas Calibradas</span>
+                <strong className="text-slate-900">LaLiga & Premier League</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* KPI Metric Cards */}
         <OverviewCards stats={overview} loading={loadingOverview} />
 
@@ -230,13 +253,13 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 border-t border-slate-900 bg-slate-950/80 py-8 text-center text-xs text-slate-500">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-2">
-          <p>
-            Plataforma de Predicción Deportiva & Machine Learning Cuantitativo.
+      <footer className="mt-16 border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-1">
+          <p className="font-semibold text-slate-700">
+            SportPredict AI · Sistema Cuantitativo de Inferencia Deportiva
           </p>
-          <p className="text-slate-600">
-            Conectado a SQLite / PostgreSQL local. Modelos calibrados con datos de La Liga y Premier League.
+          <p className="text-slate-500">
+            Conectado a SQLite / PostgreSQL local. Calibración probabilística con árboles XGBoost, LightGBM y Poisson.
           </p>
         </div>
       </footer>

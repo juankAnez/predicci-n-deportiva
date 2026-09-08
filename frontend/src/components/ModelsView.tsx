@@ -1,5 +1,5 @@
 import React from "react";
-import { Cpu, CheckCircle2, Layers, Zap, Brain, Activity, Clock } from "lucide-react";
+import { Cpu, CheckCircle2, Layers, Zap, BrainCircuit, Activity, Clock } from "lucide-react";
 import type { ModelRecord } from "../types/api";
 
 interface ModelsViewProps {
@@ -8,42 +8,51 @@ interface ModelsViewProps {
 }
 
 export const ModelsView: React.FC<ModelsViewProps> = ({ models, loading }) => {
-  const modelDescriptions: Record<string, { desc: string; icon: any; color: string; badge: string }> = {
+  const modelDescriptions: Record<
+    string,
+    { desc: string; icon: any; bgColor: string; textColor: string; badge: string }
+  > = {
     ensemble: {
-      desc: "Combina de forma adaptativa las probabilidades de todos los submodelos para maximizar la robustez predictiva y minimizar la varianza de error.",
-      icon: Brain,
-      color: "emerald",
-      badge: "Meta-Modelo Principal",
+      desc: "Combina de forma adaptativa las probabilidades de todos los submodelos para maximizar la robustez predictiva y minimizar la varianza.",
+      icon: BrainCircuit,
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-600",
+      badge: "Ensamble Principal (Ponderado)",
     },
     poisson: {
       desc: "Calcula la distribución estadística bivariada de goles esperados (xG) para local y visitante, matrices de marcadores exactos y mercados Over/Under.",
       icon: Activity,
-      color: "amber",
+      bgColor: "bg-amber-50",
+      textColor: "text-amber-600",
       badge: "Distribución de Goles",
     },
     xgboost: {
       desc: "Algoritmo de Gradient Boosted Decision Trees entrenado sobre 89 variables estadísticas para capturar relaciones no lineales complejas.",
       icon: Zap,
-      color: "cyan",
-      badge: "Gradiente Impulsado",
+      bgColor: "bg-indigo-50",
+      textColor: "text-indigo-600",
+      badge: "Gradiente Impulsado (35% peso)",
     },
     random_forest: {
       desc: "Bosque de múltiples árboles de decisión aleatorizados con validación cruzada para evitar sobreajuste y estabilizar predicciones.",
       icon: Layers,
-      color: "teal",
+      bgColor: "bg-emerald-50",
+      textColor: "text-emerald-600",
       badge: "Bagging & Varianza",
     },
     lightgbm: {
       desc: "Implementación ultra-optimizada por histogramas de árboles de decisión orientada a predicción de alta velocidad.",
       icon: Cpu,
-      color: "indigo",
-      badge: "Histogram Boost",
+      bgColor: "bg-sky-50",
+      textColor: "text-sky-600",
+      badge: "Histogram Boost (25% peso)",
     },
     neural_network: {
       desc: "Perceptrón Multicapa (MLP) con regularización L2 y Dropout para detectar patrones latentes entre rachas y ratings Elo.",
-      icon: Brain,
-      color: "purple",
-      badge: "Deep Learning MLP",
+      icon: BrainCircuit,
+      bgColor: "bg-purple-50",
+      textColor: "text-purple-600",
+      badge: "Red Neuronal MLP",
     },
   };
 
@@ -61,15 +70,18 @@ export const ModelsView: React.FC<ModelsViewProps> = ({ models, loading }) => {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur-md">
+      {/* Header Panel */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-emerald-500/20 p-2 text-emerald-400">
+          <div className="rounded-xl bg-blue-50 p-2.5 text-blue-600 border border-blue-100">
             <Cpu className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Arquitectura de Modelos de Inteligencia Artificial</h2>
-            <p className="text-xs text-slate-400">
-              6 modelos entrenados y calibrados con 2,280 partidos reales de La Liga y Premier League
+            <h2 className="text-lg font-bold text-slate-900">
+              Arquitectura de Modelos de Inteligencia Artificial
+            </h2>
+            <p className="text-xs text-slate-500 font-medium">
+              5 modelos estadísticos y de Machine Learning calibrados con validación temporal estricta
             </p>
           </div>
         </div>
@@ -78,20 +90,24 @@ export const ModelsView: React.FC<ModelsViewProps> = ({ models, loading }) => {
       {loading ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-56 animate-pulse rounded-2xl border border-slate-800 bg-slate-900/40 p-5" />
+            <div
+              key={i}
+              className="h-48 animate-pulse rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+            />
           ))}
         </div>
       ) : uniqueModels.length === 0 ? (
-        <div className="flex h-48 flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 py-8 text-center">
-          <p className="text-sm font-medium text-slate-400">No se encontraron modelos registrados.</p>
+        <div className="flex h-44 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 py-8 text-center bg-white shadow-sm">
+          <p className="text-xs font-medium text-slate-500">No se encontraron modelos registrados.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {uniqueModels.map((model) => {
             const info = modelDescriptions[model.model_name] || {
-              desc: "Modelo estadístico para predicción de resultados deportivos.",
+              desc: "Modelo cuantitativo para predicción de resultados deportivos.",
               icon: Cpu,
-              color: "emerald",
+              bgColor: "bg-blue-50",
+              textColor: "text-blue-600",
               badge: model.model_type,
             };
             const Icon = info.icon;
@@ -99,40 +115,50 @@ export const ModelsView: React.FC<ModelsViewProps> = ({ models, loading }) => {
             return (
               <div
                 key={model.id}
-                className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm transition-all hover:border-slate-700 hover:bg-slate-900/80"
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-slate-300"
               >
                 {/* Header */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2.5">
-                    <div className="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-emerald-400">
+                    <div className={`rounded-xl p-2.5 ${info.bgColor} ${info.textColor}`}>
                       <Icon className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-white capitalize text-sm">
+                      <h3 className="font-bold text-slate-900 capitalize text-sm">
                         {model.model_name.replace("_", " ")}
                       </h3>
-                      <span className="text-[11px] text-slate-400">{model.model_type}</span>
+                      <span className="text-[11px] text-slate-500 font-medium">
+                        {model.model_type}
+                      </span>
                     </div>
                   </div>
 
-                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
-                    <CheckCircle2 className="h-2.5 w-2.5" />
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                    <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                     <span>Activo</span>
                   </span>
                 </div>
 
                 {/* Description */}
-                <p className="mt-3.5 text-xs text-slate-300 leading-relaxed min-h-[50px]">{info.desc}</p>
+                <p className="mt-3 text-xs text-slate-600 leading-relaxed min-h-[48px]">
+                  {info.desc}
+                </p>
 
                 {/* Specs */}
-                <div className="mt-4 grid grid-cols-2 gap-2 border-t border-slate-800/80 pt-3 text-xs">
-                  <div className="rounded-lg bg-slate-950/40 p-2">
-                    <span className="text-[10px] text-slate-400 block">Variables Analizadas</span>
-                    <span className="font-mono font-bold text-white">{model.feature_count} features</span>
+                <div className="mt-4 grid grid-cols-2 gap-2 border-t border-slate-100 pt-3 text-xs">
+                  <div className="rounded-lg bg-slate-50 p-2 border border-slate-100">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">
+                      Variables Analizadas
+                    </span>
+                    <span className="font-mono font-bold text-slate-900">
+                      {model.feature_count} features
+                    </span>
                   </div>
-                  <div className="rounded-lg bg-slate-950/40 p-2">
-                    <span className="text-[10px] text-slate-400 block">Especialidad</span>
-                    <span className="font-semibold text-emerald-400 truncate block text-[11px]">
+                  <div className="rounded-lg bg-slate-50 p-2 border border-slate-100">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">
+                      Especialidad
+                    </span>
+                    <span className="font-bold text-slate-900 truncate block text-[11px]">
                       {info.badge}
                     </span>
                   </div>
@@ -144,7 +170,7 @@ export const ModelsView: React.FC<ModelsViewProps> = ({ models, loading }) => {
                     <Clock className="h-3 w-3" />
                     <span>Versión: {model.version}</span>
                   </span>
-                  <span className="font-mono text-emerald-400/80 text-[10px]">.joblib</span>
+                  <span className="font-mono text-slate-400 font-bold text-[10px]">.joblib</span>
                 </div>
               </div>
             );
@@ -154,4 +180,3 @@ export const ModelsView: React.FC<ModelsViewProps> = ({ models, loading }) => {
     </div>
   );
 };
-

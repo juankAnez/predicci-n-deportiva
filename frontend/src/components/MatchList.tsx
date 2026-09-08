@@ -7,9 +7,10 @@ import {
   Clock,
   ArrowRight,
   Loader2,
-  Flame,
   History,
-  TrendingUp,
+  CalendarDays,
+  Globe,
+  Shield,
 } from "lucide-react";
 import type { Match } from "../types/api";
 
@@ -54,90 +55,98 @@ export const MatchList: React.FC<MatchListProps> = ({
   });
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4 sm:p-6 backdrop-blur-sm space-y-5">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm space-y-5">
       {/* Top Status Tabs: Upcoming vs History */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
-        <div className="flex items-center gap-2 rounded-xl bg-slate-950/70 p-1 border border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div className="flex items-center gap-1.5 rounded-xl bg-slate-100 p-1 border border-slate-200/60">
           <button
             onClick={() => onSelectStatus("upcoming")}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${
               statusFilter === "upcoming"
-                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20"
-                : "text-slate-400 hover:text-white"
+                ? "bg-white text-slate-900 shadow-sm border border-slate-200/80"
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            <Flame className="h-4 w-4" />
-            <span>Próximos Partidos (Este Fin de Semana)</span>
-            <span className={`ml-1 rounded-full px-1.5 py-0.2 text-[10px] ${
-              statusFilter === "upcoming" ? "bg-slate-950 text-emerald-300" : "bg-slate-800 text-slate-400"
-            }`}>
+            <CalendarDays className="h-4 w-4 text-blue-600" />
+            <span>Próximos Partidos</span>
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                statusFilter === "upcoming"
+                  ? "bg-blue-50 text-blue-700"
+                  : "bg-slate-200 text-slate-600"
+              }`}
+            >
               20
             </span>
           </button>
 
           <button
             onClick={() => onSelectStatus("finished")}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${
               statusFilter === "finished"
-                ? "bg-gradient-to-r from-indigo-500 to-sky-500 text-white shadow-md shadow-indigo-500/20"
-                : "text-slate-400 hover:text-white"
+                ? "bg-white text-slate-900 shadow-sm border border-slate-200/80"
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            <History className="h-4 w-4" />
+            <History className="h-4 w-4 text-slate-600" />
             <span>Historial de Resultados</span>
           </button>
         </div>
 
-        <span className="text-xs text-slate-400 font-medium">
-          {totalMatches.toLocaleString()} {statusFilter === "upcoming" ? "partidos por jugar" : "partidos archivados"}
+        <span className="text-xs text-slate-500 font-medium">
+          {totalMatches.toLocaleString()}{" "}
+          {statusFilter === "upcoming" ? "partidos por jugar" : "partidos registrados"}
         </span>
       </div>
 
       {/* Filters Bar: League and Search */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {/* League Selector */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <button
             onClick={() => onSelectLeague(undefined)}
-            className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
               selectedLeague === undefined
-                ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
-                : "border border-slate-800 bg-slate-800/40 text-slate-300 hover:bg-slate-800 hover:text-white"
+                ? "bg-slate-900 text-white shadow-sm"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
             }`}
           >
-            Todas las Ligas
+            <Globe className="h-3.5 w-3.5" />
+            <span>Todas</span>
           </button>
           <button
             onClick={() => onSelectLeague("PD")}
-            className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
               selectedLeague === "PD"
-                ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
-                : "border border-slate-800 bg-slate-800/40 text-slate-300 hover:bg-slate-800 hover:text-white"
+                ? "bg-slate-900 text-white shadow-sm"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
             }`}
           >
-            🇪🇸 La Liga
+            <Shield className="h-3.5 w-3.5 text-amber-500" />
+            <span>LaLiga EA Sports</span>
           </button>
           <button
             onClick={() => onSelectLeague("PL")}
-            className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
               selectedLeague === "PL"
-                ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
-                : "border border-slate-800 bg-slate-800/40 text-slate-300 hover:bg-slate-800 hover:text-white"
+                ? "bg-slate-900 text-white shadow-sm"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
             }`}
           >
-            🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League
+            <Shield className="h-3.5 w-3.5 text-blue-500" />
+            <span>Premier League</span>
           </button>
         </div>
 
         {/* Search Box */}
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+        <div className="relative w-full sm:w-60">
+          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Buscar por equipo..."
+            placeholder="Buscar club..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl border border-slate-800 bg-slate-950/60 py-1.5 pl-9 pr-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
           />
         </div>
       </div>
@@ -145,16 +154,18 @@ export const MatchList: React.FC<MatchListProps> = ({
       {/* Matches Grid */}
       <div className="mt-2">
         {loading ? (
-          <div className="flex h-64 flex-col items-center justify-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
-            <p className="text-sm text-slate-400">Cargando partidos desde el backend...</p>
+          <div className="flex h-64 flex-col items-center justify-center gap-2">
+            <Loader2 className="h-7 w-7 animate-spin text-blue-600" />
+            <p className="text-xs text-slate-500">Cargando partidos...</p>
           </div>
         ) : filteredMatches.length === 0 ? (
-          <div className="flex h-48 flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 py-8 text-center">
-            <p className="text-sm font-medium text-slate-400">No se encontraron partidos con los filtros actuales.</p>
+          <div className="flex h-44 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 py-8 text-center bg-slate-50/50">
+            <p className="text-xs font-medium text-slate-500">
+              No se encontraron partidos con los filtros actuales.
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-2">
             {filteredMatches.map((match) => {
               const isSelected = match.id === selectedMatchId;
               const isLaLiga =
@@ -167,28 +178,29 @@ export const MatchList: React.FC<MatchListProps> = ({
                 <div
                   key={match.id}
                   onClick={() => onSelectMatch(match)}
-                  className={`group relative cursor-pointer overflow-hidden rounded-xl border p-4 transition-all duration-200 hover:scale-[1.01] ${
+                  className={`group cursor-pointer rounded-xl border p-4 transition-all ${
                     isSelected
-                      ? "border-emerald-500/80 bg-emerald-500/10 shadow-lg shadow-emerald-500/10"
-                      : "border-slate-800/80 bg-slate-950/40 hover:border-slate-700 hover:bg-slate-900/60"
+                      ? "border-blue-600 bg-blue-50/40 shadow-sm ring-2 ring-blue-500/20"
+                      : "border-slate-200 bg-white hover:border-blue-300 hover:shadow-sm"
                   }`}
                 >
-                  {/* Card Header: League and Date/Time */}
-                  <div className="flex items-center justify-between text-[11px] text-slate-400">
+                  {/* Header: League & Date */}
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 border-b border-slate-100 pb-2">
                     <span
-                      className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-medium ${
+                      className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-bold ${
                         isLaLiga
-                          ? "border border-amber-500/30 bg-amber-500/10 text-amber-300"
-                          : "border border-sky-500/30 bg-sky-500/10 text-sky-300"
+                          ? "bg-amber-50 text-amber-800 border border-amber-200/60"
+                          : "bg-blue-50 text-blue-800 border border-blue-200/60"
                       }`}
                     >
-                      {isLaLiga ? "🇪🇸 La Liga" : "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier"}
+                      <Shield className="h-3 w-3" />
+                      {isLaLiga ? "LaLiga" : "Premier League"}
                     </span>
-                    <div className="flex items-center gap-1 text-slate-400">
-                      <Calendar className="h-3 w-3" />
-                      <span>{match.date || "Fecha por definir"}</span>
+                    <div className="flex items-center gap-1 text-slate-500">
+                      <Calendar className="h-3 w-3 text-slate-400" />
+                      <span>{match.date || "Por definir"}</span>
                       {match.time && (
-                        <span className="flex items-center gap-0.5 text-slate-500 ml-1">
+                        <span className="flex items-center gap-0.5 text-slate-400 ml-1">
                           <Clock className="h-3 w-3" />
                           {match.time.slice(0, 5)}
                         </span>
@@ -200,20 +212,20 @@ export const MatchList: React.FC<MatchListProps> = ({
                   <div className="mt-3 flex items-center justify-between gap-2">
                     {/* Home Team */}
                     <div className="flex-1 text-left">
-                      <p className="font-semibold text-white group-hover:text-emerald-300 transition-colors">
+                      <p className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
                         {match.home_team_name}
                       </p>
-                      <span className="text-[11px] text-slate-500">Local</span>
+                      <span className="text-[11px] text-slate-400 font-medium">Local</span>
                     </div>
 
                     {/* Result or VS badge */}
-                    <div className="flex flex-col items-center justify-center px-3">
+                    <div className="flex flex-col items-center justify-center px-2">
                       {!isUpcoming ? (
-                        <div className="rounded-lg border border-slate-700/60 bg-slate-800/80 px-2.5 py-1 text-sm font-bold text-white shadow-inner">
+                        <div className="rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-900">
                           {match.home_score} - {match.away_score}
                         </div>
                       ) : (
-                        <span className="rounded-md bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-bold text-emerald-400">
+                        <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-[11px] font-bold text-slate-600">
                           VS
                         </span>
                       )}
@@ -221,47 +233,44 @@ export const MatchList: React.FC<MatchListProps> = ({
 
                     {/* Away Team */}
                     <div className="flex-1 text-right">
-                      <p className="font-semibold text-white group-hover:text-emerald-300 transition-colors">
+                      <p className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
                         {match.away_team_name}
                       </p>
-                      <span className="text-[11px] text-slate-500">Visitante</span>
+                      <span className="text-[11px] text-slate-400 font-medium">Visitante</span>
                     </div>
                   </div>
 
                   {/* Odds Preview (if upcoming) */}
                   {isUpcoming && match.odds && (
-                    <div className="mt-3 flex items-center justify-between rounded-lg bg-slate-900/80 border border-slate-800/80 px-2.5 py-1.5 text-[11px]">
-                      <span className="text-slate-500 flex items-center gap-1">
-                        <TrendingUp className="h-3 w-3 text-emerald-400" />
-                        Cuotas:
-                      </span>
+                    <div className="mt-3 flex items-center justify-between rounded-lg bg-slate-50 border border-slate-200/80 px-2.5 py-1.5 text-[11px]">
+                      <span className="text-slate-500 font-medium">Cuotas de Mercado:</span>
                       <div className="flex items-center gap-2 font-mono">
-                        <span className="text-slate-300">
-                          1: <strong className="text-white">{match.odds.h.toFixed(2)}</strong>
+                        <span className="text-slate-600">
+                          1: <strong className="text-slate-900">{match.odds.h.toFixed(2)}</strong>
                         </span>
-                        <span className="text-slate-500">|</span>
-                        <span className="text-slate-300">
-                          X: <strong className="text-white">{match.odds.d.toFixed(2)}</strong>
+                        <span className="text-slate-300">·</span>
+                        <span className="text-slate-600">
+                          X: <strong className="text-slate-900">{match.odds.d.toFixed(2)}</strong>
                         </span>
-                        <span className="text-slate-500">|</span>
-                        <span className="text-slate-300">
-                          2: <strong className="text-white">{match.odds.a.toFixed(2)}</strong>
+                        <span className="text-slate-300">·</span>
+                        <span className="text-slate-600">
+                          2: <strong className="text-slate-900">{match.odds.a.toFixed(2)}</strong>
                         </span>
                       </div>
                     </div>
                   )}
 
-                  {/* Card Footer: CTA */}
-                  <div className="mt-3 flex items-center justify-between border-t border-slate-800/60 pt-2.5 text-xs">
-                    <span className="text-slate-500 text-[11px]">
+                  {/* Card Footer */}
+                  <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 text-xs">
+                    <span className="text-slate-400 text-[11px]">
                       {match.stage || `Partido #${match.id}`}
                     </span>
                     <span
-                      className={`inline-flex items-center gap-1 font-medium transition-colors ${
-                        isSelected ? "text-emerald-400 font-semibold" : "text-slate-400 group-hover:text-emerald-400"
+                      className={`inline-flex items-center gap-1 text-xs font-semibold ${
+                        isSelected ? "text-blue-600" : "text-slate-500 group-hover:text-blue-600"
                       }`}
                     >
-                      <span>{isSelected ? "Seleccionado" : isUpcoming ? "Predecir (+EV)" : "Ver Análisis"}</span>
+                      <span>{isSelected ? "Seleccionado" : isUpcoming ? "Analizar con IA" : "Ver Análisis"}</span>
                       <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                     </span>
                   </div>
@@ -274,29 +283,29 @@ export const MatchList: React.FC<MatchListProps> = ({
 
       {/* Pagination Footer */}
       {!loading && totalPages > 1 && (
-        <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-slate-800/80 pt-4 sm:flex-row">
-          <p className="text-xs text-slate-400">
-            Página <span className="font-semibold text-white">{currentPage}</span> de{" "}
-            <span className="font-semibold text-white">{totalPages}</span> ({totalMatches.toLocaleString()} partidos)
+        <div className="mt-5 flex flex-col items-center justify-between gap-3 border-t border-slate-100 pt-4 sm:flex-row">
+          <p className="text-xs text-slate-500">
+            Página <strong className="text-slate-900">{currentPage}</strong> de{" "}
+            <strong className="text-slate-900">{totalPages}</strong> ({totalMatches.toLocaleString()} partidos)
           </p>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage <= 1}
-              className="flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-800/50 px-3 py-1.5 text-xs font-medium text-slate-300 transition-all hover:bg-slate-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-3.5 w-3.5" />
               <span>Anterior</span>
             </button>
 
             <button
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage >= totalPages}
-              className="flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-800/50 px-3 py-1.5 text-xs font-medium text-slate-300 transition-all hover:bg-slate-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <span>Siguiente</span>
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
@@ -304,5 +313,3 @@ export const MatchList: React.FC<MatchListProps> = ({
     </div>
   );
 };
-
-
