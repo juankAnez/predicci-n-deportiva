@@ -199,3 +199,42 @@ def get_h2h():
             for m in h2h
         ],
     })
+
+
+@match_bp.route("/<int:match_id>/result", methods=["POST", "PUT"])
+def update_match_result(match_id: int):
+    """
+    Guarda el resultado final de un partido terminado.
+    Automáticamente pasa de 'Próximo' a 'Historial' y se incorpora al cálculo de métricas futuras.
+    """
+    payload = request.get_json() or {}
+    home_score = payload.get("home_score")
+    away_score = payload.get("away_score")
+
+    if home_score is None or away_score is None:
+        return jsonify({"status": "error", "error": "home_score y away_score son requeridos"}), 400
+
+    data = {
+        "home_score": int(home_score),
+        "away_score": int(away_score),
+    }
+    if "home_xg" in payload and payload["home_xg"] is not None:
+        data["home_xg"] = float(payload["home_xg"])
+    if "away_xg" in payload and payload["away_xg"] is not None:
+        data["away_xg"] = float(payload["away_xg"])
+
+    updated = match_repo.update(match_id, data)
+    if not updated:
+        return jsonify({"status": "error", "error": f"Partido con ID {match_id} no encontrado"}), 404
+
+    return jsonify({
+        "status": "success",
+        "message": f"Resultado guardado exitosamente: {updated.home_score} - {updated.away_score}",
+        "data": {
+            "id": updated.id,
+            "home_score": updated.home_score,
+            "away_score": updated.away_score,
+            "is_finished": updated.is_finished,
+        },
+    })
+
