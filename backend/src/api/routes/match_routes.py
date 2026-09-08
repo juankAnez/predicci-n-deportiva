@@ -56,6 +56,42 @@ DEFAULT_MATCH_ODDS = {
     (26, 59): {"h": 2.05, "d": 3.50, "a": 3.50},  # Arsenal vs Leverkusen
     (7, 63):  {"h": 2.30, "d": 3.70, "a": 2.85},  # Barcelona vs PSG
     (51, 58): {"h": 2.10, "d": 3.40, "a": 3.40},  # Juventus vs Dortmund
+
+    # UEFA Europa League (Jornada 1)
+    (35, 53): {"h": 2.00, "d": 3.40, "a": 3.70},  # Tottenham vs Roma
+    (41, 66): {"h": 1.75, "d": 3.80, "a": 4.40},  # Man United vs Lyon
+    (15, 61): {"h": 1.95, "d": 3.50, "a": 3.80},  # Ath Bilbao vs Frankfurt
+    (38, 19): {"h": 1.60, "d": 4.00, "a": 5.20},  # Chelsea vs Betis
+    (55, 10): {"h": 2.15, "d": 3.30, "a": 3.40},  # Lazio vs Sociedad
+    (65, 56): {"h": 2.05, "d": 3.40, "a": 3.50},  # Marsella vs Fiorentina
+
+    # Copa del Rey (España)
+    (14, 2):  {"h": 1.30, "d": 5.50, "a": 9.00},  # Real Madrid vs Sevilla
+    (7, 15):  {"h": 1.55, "d": 4.20, "a": 5.50},  # Barcelona vs Ath Bilbao
+    (18, 10): {"h": 1.85, "d": 3.50, "a": 4.20},  # Ath Madrid vs Sociedad
+    (6, 19):  {"h": 2.10, "d": 3.40, "a": 3.40},  # Villarreal vs Betis
+
+    # FA Cup (Inglaterra)
+    (44, 38): {"h": 1.65, "d": 4.00, "a": 4.80},  # Man City vs Chelsea
+    (26, 41): {"h": 1.55, "d": 4.20, "a": 5.50},  # Arsenal vs Man United
+    (28, 33): {"h": 1.50, "d": 4.40, "a": 6.00},  # Liverpool vs Newcastle
+    (35, 30): {"h": 2.20, "d": 3.50, "a": 3.10},  # Tottenham vs Aston Villa
+
+    # Coppa Italia (Italia)
+    (49, 53): {"h": 1.65, "d": 3.80, "a": 5.20},  # Inter vs Roma
+    (51, 55): {"h": 1.85, "d": 3.40, "a": 4.40},  # Juventus vs Lazio
+    (50, 54): {"h": 2.20, "d": 3.40, "a": 3.20},  # Milan vs Atalanta
+    (52, 56): {"h": 1.70, "d": 3.70, "a": 4.80},  # Napoli vs Fiorentina
+
+    # DFB-Pokal (Alemania)
+    (57, 62): {"h": 1.35, "d": 5.20, "a": 8.00},  # Bayern vs Stuttgart
+    (59, 61): {"h": 1.55, "d": 4.20, "a": 5.50},  # Leverkusen vs Frankfurt
+    (58, 60): {"h": 2.20, "d": 3.60, "a": 3.00},  # Dortmund vs Leipzig
+
+    # Coupe de France (Francia)
+    (63, 66): {"h": 1.40, "d": 5.00, "a": 7.00},  # PSG vs Lyon
+    (64, 65): {"h": 2.15, "d": 3.50, "a": 3.20},  # Monaco vs Marsella
+    (67, 68): {"h": 1.95, "d": 3.40, "a": 3.90},  # Lille vs Rennes
 }
 
 
@@ -99,20 +135,34 @@ def list_matches():
     
     if league:
         l_upper = league.strip().upper()
-        if l_upper in ("PL", "PREMIER", "PREMIER LEAGUE", "ENG_PL", "ENGLAND"):
-            matches = [m for m in matches if m.competition_id in (4, 5, 6, 13)]
-        elif l_upper in ("PD", "LIGA", "LA LIGA", "ESP_L1", "SPAIN"):
-            matches = [m for m in matches if m.competition_id in (1, 2, 3, 12)]
-        elif l_upper in ("SA", "SERIE A", "SERIE_A", "ITA_SA", "ITALY"):
-            matches = [m for m in matches if m.competition_id in (7, 14)]
-        elif l_upper in ("BL", "BUNDESLIGA", "GER_BL", "GERMANY"):
-            matches = [m for m in matches if m.competition_id in (8, 15)]
-        elif l_upper in ("L1", "LIGUE 1", "LIGUE_1", "FRA_L1", "FRANCE"):
-            matches = [m for m in matches if m.competition_id in (9, 16)]
+        if l_upper in ("PL", "PREMIER", "PREMIER LEAGUE", "ENG_PL"):
+            matches = [m for m in matches if m.competition_id in (4, 5, 6)]
+        elif l_upper in ("PD", "LIGA", "LA LIGA", "ESP_L1"):
+            matches = [m for m in matches if m.competition_id in (1, 2, 3)]
+        elif l_upper in ("SA", "SERIE A", "SERIE_A", "ITA_SA"):
+            matches = [m for m in matches if m.competition_id == 7]
+        elif l_upper in ("BL", "BUNDESLIGA", "GER_BL"):
+            matches = [m for m in matches if m.competition_id == 8]
+        elif l_upper in ("L1", "LIGUE 1", "LIGUE_1", "FRA_L1"):
+            matches = [m for m in matches if m.competition_id == 9]
         elif l_upper in ("UCL", "CHAMPIONS", "CHAMPIONS LEAGUE", "UEFA_CL"):
             matches = [m for m in matches if m.competition_id == 10]
         elif l_upper in ("UEL", "EUROPA", "EUROPA LEAGUE", "UEFA_EL"):
             matches = [m for m in matches if m.competition_id == 11]
+        elif l_upper in ("CDR", "COPA DEL REY", "COPA_DEL_REY", "ESP_CDR"):
+            matches = [m for m in matches if m.competition_id == 12]
+        elif l_upper in ("FAC", "FA CUP", "FA_CUP", "ENG_FAC"):
+            matches = [m for m in matches if m.competition_id == 13]
+        elif l_upper in ("CI", "COPPA ITALIA", "COPPA_ITALIA", "ITA_CI"):
+            matches = [m for m in matches if m.competition_id == 14]
+        elif l_upper in ("DFB", "DFB-POKAL", "DFB_POKAL", "GER_POK"):
+            matches = [m for m in matches if m.competition_id == 15]
+        elif l_upper in ("CDF", "COUPE DE FRANCE", "COUPE_DE_FRANCE", "FRA_CDF"):
+            matches = [m for m in matches if m.competition_id == 16]
+        elif l_upper in ("COPAS", "CUPS", "COPAS NACIONALES"):
+            matches = [m for m in matches if m.competition_id in (12, 13, 14, 15, 16)]
+        elif l_upper in ("CONTINENTAL", "EUROPE"):
+            matches = [m for m in matches if m.competition_id in (10, 11)]
     elif competition_id:
         matches = [m for m in matches if m.competition_id == competition_id]
 

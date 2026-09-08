@@ -28,6 +28,9 @@ export interface Team {
   league_code?: string;
   confederation?: string;
   competition_id?: number;
+  competitions?: string[];
+  is_ucl?: boolean;
+  is_uel?: boolean;
 }
 
 export interface Match {

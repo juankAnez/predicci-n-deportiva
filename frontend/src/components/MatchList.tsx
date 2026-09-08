@@ -59,6 +59,24 @@ export const MatchList: React.FC<MatchListProps> = ({
     if (compId === 10 || compCode === "UCL") {
       return { name: "Champions League", style: "border-teal-500/30 bg-teal-500/10 text-teal-300" };
     }
+    if (compId === 11 || compCode === "UEL") {
+      return { name: "Europa League", style: "border-amber-500/30 bg-amber-500/10 text-amber-300" };
+    }
+    if (compId === 12 || compCode === "CDR") {
+      return { name: "Copa del Rey", style: "border-rose-500/30 bg-rose-500/10 text-rose-300" };
+    }
+    if (compId === 13 || compCode === "FAC") {
+      return { name: "FA Cup", style: "border-sky-500/30 bg-sky-500/10 text-sky-300" };
+    }
+    if (compId === 14 || compCode === "CI") {
+      return { name: "Coppa Italia", style: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" };
+    }
+    if (compId === 15 || compCode === "DFB") {
+      return { name: "DFB-Pokal", style: "border-yellow-500/30 bg-yellow-500/10 text-yellow-300" };
+    }
+    if (compId === 16 || compCode === "CDF") {
+      return { name: "Coupe de France", style: "border-blue-500/30 bg-blue-500/10 text-blue-300" };
+    }
     if (compId === 7 || compCode === "SA") {
       return { name: "Serie A", style: "border-blue-500/30 bg-blue-500/10 text-blue-300" };
     }
@@ -68,7 +86,7 @@ export const MatchList: React.FC<MatchListProps> = ({
     if (compId === 9 || compCode === "L1") {
       return { name: "Ligue 1", style: "border-indigo-500/30 bg-indigo-500/10 text-indigo-300" };
     }
-    if (compId && [4, 5, 6, 13].includes(compId)) {
+    if ([4, 5, 6].includes(compId || 0) || compCode === "PL") {
       return { name: "Premier League", style: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300" };
     }
     return { name: "La Liga", style: "border-amber-500/30 bg-amber-500/10 text-amber-300" };
@@ -96,7 +114,7 @@ export const MatchList: React.FC<MatchListProps> = ({
                   : "bg-slate-800 text-slate-400"
               }`}
             >
-              {totalMatches > 0 && statusFilter === "upcoming" ? totalMatches : 36}
+              {totalMatches > 0 && statusFilter === "upcoming" ? totalMatches : 53}
             </span>
           </button>
 
@@ -119,104 +137,187 @@ export const MatchList: React.FC<MatchListProps> = ({
         </span>
       </div>
 
-      {/* European Leagues Selector */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <button
-            onClick={() => onSelectLeague(undefined)}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
-              selectedLeague === undefined
-                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
-                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            <Globe className="h-3.5 w-3.5" />
-            <span>Todas</span>
-          </button>
+      {/* European Leagues & Tournaments Selector */}
+      <div className="space-y-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <button
+              onClick={() => onSelectLeague(undefined)}
+              className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                selectedLeague === undefined
+                  ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                  : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <Globe className="h-3.5 w-3.5" />
+              <span>Todas</span>
+            </button>
 
-          <button
-            onClick={() => onSelectLeague("PD")}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
-              selectedLeague === "PD"
-                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
-                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            <Shield className="h-3.5 w-3.5 text-amber-400" />
-            <span>La Liga</span>
-          </button>
+            <span className="text-slate-700 hidden sm:inline">|</span>
 
-          <button
-            onClick={() => onSelectLeague("PL")}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
-              selectedLeague === "PL"
-                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
-                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            <Shield className="h-3.5 w-3.5 text-cyan-400" />
-            <span>Premier</span>
-          </button>
+            {/* Top 5 Leagues */}
+            <button
+              onClick={() => onSelectLeague("PD")}
+              className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                selectedLeague === "PD"
+                  ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                  : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <Shield className="h-3.5 w-3.5 text-amber-400" />
+              <span>La Liga</span>
+            </button>
 
-          <button
-            onClick={() => onSelectLeague("SA")}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
-              selectedLeague === "SA"
-                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
-                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            <Shield className="h-3.5 w-3.5 text-blue-400" />
-            <span>Serie A</span>
-          </button>
+            <button
+              onClick={() => onSelectLeague("PL")}
+              className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                selectedLeague === "PL"
+                  ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                  : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <Shield className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Premier</span>
+            </button>
 
-          <button
-            onClick={() => onSelectLeague("BL")}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
-              selectedLeague === "BL"
-                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
-                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            <Shield className="h-3.5 w-3.5 text-rose-400" />
-            <span>Bundesliga</span>
-          </button>
+            <button
+              onClick={() => onSelectLeague("SA")}
+              className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                selectedLeague === "SA"
+                  ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                  : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <Shield className="h-3.5 w-3.5 text-blue-400" />
+              <span>Serie A</span>
+            </button>
 
-          <button
-            onClick={() => onSelectLeague("L1")}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
-              selectedLeague === "L1"
-                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
-                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            <Shield className="h-3.5 w-3.5 text-indigo-400" />
-            <span>Ligue 1</span>
-          </button>
+            <button
+              onClick={() => onSelectLeague("BL")}
+              className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                selectedLeague === "BL"
+                  ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                  : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <Shield className="h-3.5 w-3.5 text-rose-400" />
+              <span>Bundesliga</span>
+            </button>
 
+            <button
+              onClick={() => onSelectLeague("L1")}
+              className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                selectedLeague === "L1"
+                  ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                  : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <Shield className="h-3.5 w-3.5 text-indigo-400" />
+              <span>Ligue 1</span>
+            </button>
+          </div>
+
+          {/* Search Box */}
+          <div className="relative w-full sm:w-56">
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
+            <input
+              type="text"
+              placeholder="Buscar club..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-xl border border-slate-800 bg-slate-900/90 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/20"
+            />
+          </div>
+        </div>
+
+        {/* Second Row: European Cups & National Cups */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mr-1">
+            Copas:
+          </span>
           <button
             onClick={() => onSelectLeague("UCL")}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-semibold transition-all ${
               selectedLeague === "UCL"
                 ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
                 : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
             }`}
           >
-            <Trophy className="h-3.5 w-3.5 text-teal-400" />
+            <Trophy className="h-3 w-3 text-teal-400" />
             <span>Champions</span>
           </button>
-        </div>
 
-        {/* Search Box */}
-        <div className="relative w-full sm:w-56">
-          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
-          <input
-            type="text"
-            placeholder="Buscar club..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl border border-slate-800 bg-slate-900/90 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/20"
-          />
+          <button
+            onClick={() => onSelectLeague("UEL")}
+            className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-semibold transition-all ${
+              selectedLeague === "UEL"
+                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+            }`}
+          >
+            <Trophy className="h-3 w-3 text-amber-400" />
+            <span>Europa League</span>
+          </button>
+
+          <button
+            onClick={() => onSelectLeague("CDR")}
+            className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-semibold transition-all ${
+              selectedLeague === "CDR"
+                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+            }`}
+          >
+            <Shield className="h-3 w-3 text-rose-400" />
+            <span>Copa del Rey</span>
+          </button>
+
+          <button
+            onClick={() => onSelectLeague("FAC")}
+            className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-semibold transition-all ${
+              selectedLeague === "FAC"
+                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+            }`}
+          >
+            <Shield className="h-3 w-3 text-sky-400" />
+            <span>FA Cup</span>
+          </button>
+
+          <button
+            onClick={() => onSelectLeague("CI")}
+            className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-semibold transition-all ${
+              selectedLeague === "CI"
+                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+            }`}
+          >
+            <Shield className="h-3 w-3 text-emerald-400" />
+            <span>Coppa Italia</span>
+          </button>
+
+          <button
+            onClick={() => onSelectLeague("DFB")}
+            className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-semibold transition-all ${
+              selectedLeague === "DFB"
+                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+            }`}
+          >
+            <Shield className="h-3 w-3 text-yellow-400" />
+            <span>DFB-Pokal</span>
+          </button>
+
+          <button
+            onClick={() => onSelectLeague("CDF")}
+            className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-semibold transition-all ${
+              selectedLeague === "CDF"
+                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
+            }`}
+          >
+            <Shield className="h-3 w-3 text-blue-400" />
+            <span>Coupe de France</span>
+          </button>
         </div>
       </div>
 
