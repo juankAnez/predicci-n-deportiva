@@ -9,12 +9,15 @@ import pandas as pd
 
 from src.config import settings
 from src.domain.entities import Prediction
+from src.domain.value_objects.betting_market import BettingOdds
 from src.infrastructure.database.repositories import (
-    MatchRepository, PredictionRepository
+    MatchRepository, PredictionRepository, TeamRepository
 )
 from src.application.services.feature_service import FeatureService
 from src.ml.models.base_model import BaseModel
 from src.ml.models.poisson_model import PoissonModel
+from src.ml.models.xgboost_model import XGBoostModel
+from src.ml.models.random_forest_model import RandomForestModel
 from src.ml.models.ensemble_model import EnsembleModel
 from src.ml.explainability.shap_explainer import SHAPExplainer
 
@@ -25,6 +28,7 @@ class PredictionService:
     def __init__(self):
         self.feature_service = FeatureService()
         self.match_repo = MatchRepository()
+        self.team_repo = TeamRepository()
         self.prediction_repo = PredictionRepository()
         self.explainer = SHAPExplainer()
         self.model: Optional[EnsembleModel] = None
@@ -39,19 +43,36 @@ class PredictionService:
                 "No hay modelos entrenados. Ejecute train_models.py primero."
             )
 
-        ensemble = EnsembleModel()
-        for model_class, name, weight in [
-            (PoissonModel, "poisson", 0.15),
-        ]:
+        # Check if saved ensemble exists
+        ensemble_path = self._find_latest_model("ensemble")
+        if ensemble_path:
+            try:
+                ensemble = EnsembleModel()
+                ensemble.load(str(ensemble_path))
+                self.model = ensemble
+                return ensemble
+            except Exception as e:
+                logger.warning(f"Error cargando ensemble guardado: {e}")
+
+        ensemble = EnsembleModel(method="weighted_average")
+        available = [
+            (PoissonModel, "poisson", 0.20),
+            (XGBoostModel, "xgboost", 0.40),
+            (RandomForestModel, "random_forest", 0.40),
+        ]
+        for model_cls, name, weight in available:
             model_path = self._find_latest_model(name)
             if model_path:
-                model = model_class()
-                model.load(str(model_path))
-                ensemble.add_model(model, weight)
+                try:
+                    m = model_cls()
+                    m.load(str(model_path))
+                    ensemble.add_model(m, weight)
+                except Exception as ex:
+                    logger.warning(f"Error cargando {name}: {ex}")
 
         if not ensemble.models:
             raise FileNotFoundError(
-                "No se encontraron modelos entrenados en el directorio."
+                "No se encontraron modelos entrenados en el directorio. Ejecute train_models.py primero."
             )
 
         self.model = ensemble
@@ -65,7 +86,7 @@ class PredictionService:
             return sorted(files)[-1]
         return None
 
-    def predict_match(self, match_id: int) -> Dict[str, Any]:
+    def predict_match(self, match_id: int, odds: Optional[BettingOdds] = None) -> Dict[str, Any]:
         match = self.match_repo.get_by_id(match_id)
         if not match:
             raise ValueError(f"Match {match_id} no encontrado")
@@ -76,16 +97,32 @@ class PredictionService:
         )
 
         ensemble = self._load_models()
+        if ensemble.feature_names and isinstance(features, pd.DataFrame):
+            for col in ensemble.feature_names:
+                if col not in features.columns:
+                    features[col] = 0.0
+            features = features[ensemble.feature_names]
+
         if isinstance(features, pd.DataFrame):
+            features = features.fillna(0.0)
             X = features.values.astype(np.float32)
         else:
             X = features.astype(np.float32)
+
+        X = np.nan_to_num(X, nan=0.0)
 
         if X.ndim == 1:
             X = X.reshape(1, -1)
 
         proba = ensemble.predict_proba(X)[0]
-        pred_class = np.argmax(proba)
+        # Normalize proba to sum to 1.0
+        p_sum = float(np.sum(proba))
+        if p_sum > 0:
+            proba = proba / p_sum
+        else:
+            proba = np.array([0.45, 0.25, 0.30])
+
+        pred_class = int(np.argmax(proba))
         result_map = {0: "H", 1: "D", 2: "A"}
 
         poisson_model = None
@@ -94,19 +131,21 @@ class PredictionService:
                 poisson_model = m
                 break
 
-        home_team_name = self.match_repo.get_by_id(match_id).home_team_name or f"Team_{match.home_team_id}"
-        away_team_name = self.match_repo.get_by_id(match_id).away_team_name or f"Team_{match.away_team_id}"
+        home_team = self.team_repo.get_by_id(match.home_team_id)
+        away_team = self.team_repo.get_by_id(match.away_team_id)
+        home_team_name = home_team.name if home_team else f"Team_{match.home_team_id}"
+        away_team_name = away_team.name if away_team else f"Team_{match.away_team_id}"
 
         score_probs = {}
         home_goals_exp = 0.0
         away_goals_exp = 0.0
         if poisson_model:
             score_probs = poisson_model.predict_score_proba(
-                str(match.home_team_id), str(match.away_team_id)
+                match.home_team_id, match.away_team_id
             )
             exp = poisson_model.predict(pd.DataFrame([{
-                "team_home": str(match.home_team_id),
-                "team_away": str(match.away_team_id),
+                "team_home": match.home_team_id,
+                "team_away": match.away_team_id,
             }]))[0]
             home_goals_exp = float(exp[0])
             away_goals_exp = float(exp[1])
@@ -114,10 +153,19 @@ class PredictionService:
         over_under = {}
         if poisson_model:
             over_under = poisson_model.predict_over_under(
-                str(match.home_team_id), str(match.away_team_id)
+                match.home_team_id, match.away_team_id
             )
 
         explanation = self.explainer.explain(ensemble, X, features.columns.tolist())
+
+        market_analysis = None
+        if odds:
+            model_probs_map = {
+                "H": float(proba[0]),
+                "D": float(proba[1]),
+                "A": float(proba[2]),
+            }
+            market_analysis = odds.analyze_value(model_probs_map)
 
         prediction = Prediction(
             match_id=match_id,
@@ -148,7 +196,13 @@ class PredictionService:
         except Exception as e:
             logger.error(f"Error guardando predicción: {e}")
 
-        return self._format_response(prediction, explanation, match_id)
+        resp = self._format_response(prediction, explanation, match_id)
+        resp["teams"] = {
+            "home": home_team_name,
+            "away": away_team_name,
+        }
+        resp["market_analysis"] = market_analysis
+        return resp
 
     def _format_response(self, prediction: Prediction, explanation: Dict[str, Any],
                           match_id: int) -> Dict[str, Any]:

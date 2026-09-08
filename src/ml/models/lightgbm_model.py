@@ -38,7 +38,24 @@ class LightGBMModel(BaseModel):
         return self.model.predict(X)
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
-        return self.model.predict(X)
+        if hasattr(self.model, "predict_proba"):
+            return self.model.predict_proba(X)
+        exp_goals = self.model.predict(X)
+        if exp_goals.ndim > 1 and exp_goals.shape[1] >= 2:
+            from scipy.stats import poisson
+            results = []
+            for row in exp_goals:
+                eh, ea = max(float(row[0]), 0.1), max(float(row[1]), 0.1)
+                hp = np.array([poisson.pmf(g, eh) for g in range(11)])
+                ap = np.array([poisson.pmf(g, ea) for g in range(11)])
+                mat = np.outer(hp, ap)
+                hw = float(np.sum(np.tril(mat, k=-1)))
+                dr = float(np.sum(np.diag(mat)))
+                aw = float(np.sum(np.triu(mat, k=1)))
+                tot = hw + dr + aw
+                results.append([hw / tot, dr / tot, aw / tot] if tot > 0 else [0.45, 0.25, 0.30])
+            return np.array(results)
+        return exp_goals
 
     def get_feature_importance(self) -> Optional[Dict[str, float]]:
         if not self.is_trained:

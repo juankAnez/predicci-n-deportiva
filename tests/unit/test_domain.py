@@ -75,7 +75,8 @@ class TestValueObjects:
     def test_player_defaults(self):
         player = Player(name="Neymar")
         assert player.name == "Neymar"
-        assert player.goals is None  # player stats, not player itself - player has no goals field
+        assert player.age is None
+        assert player.position is None
 
     def test_competition_with_type(self):
         from src.config.constants import CompetitionType

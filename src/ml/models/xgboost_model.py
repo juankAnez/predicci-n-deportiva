@@ -32,13 +32,19 @@ class XGBoostModel(BaseModel):
         early_stopping = kwargs.get("early_stopping_rounds", 50)
         verbose = kwargs.get("verbose", False)
 
-        fit_params = {
+        fit_kwargs = {
             "eval_set": eval_set or [(X, y)],
-            "early_stopping_rounds": early_stopping,
             "verbose": verbose,
         }
 
-        self.model.fit(X, y, **fit_params)
+        if early_stopping:
+            fit_kwargs["early_stopping_rounds"] = early_stopping
+
+        try:
+            self.model.fit(X, y, **fit_kwargs)
+        except TypeError:
+            fit_kwargs.pop("early_stopping_rounds", None)
+            self.model.fit(X, y, **fit_kwargs)
         self.is_trained = True
 
         result = self.model.evals_result() if hasattr(self.model, "evals_result") else {}

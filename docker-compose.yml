@@ -39,7 +39,8 @@ services:
     ports:
       - "5000:5000"
     environment:
-      FLASK_ENV: ${FLASK_ENV:-production}
+      DB_HOST: postgres
+      REDIS_HOST: redis
       DATABASE_URL: postgresql://${DB_USER:-prediccion_user}:${DB_PASSWORD:-changeme123}@postgres:5432/prediccion_deportiva
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key}
@@ -59,8 +60,12 @@ services:
       context: .
       dockerfile: Dockerfile.worker
     environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
       DATABASE_URL: postgresql://${DB_USER:-prediccion_user}:${DB_PASSWORD:-changeme123}@postgres:5432/prediccion_deportiva
       REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
     depends_on:
@@ -76,8 +81,12 @@ services:
       context: .
       dockerfile: Dockerfile.worker
     environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
       DATABASE_URL: postgresql://${DB_USER:-prediccion_user}:${DB_PASSWORD:-changeme123}@postgres:5432/prediccion_deportiva
       REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
     depends_on:

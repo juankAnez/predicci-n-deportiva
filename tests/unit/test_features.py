@@ -40,7 +40,7 @@ class TestFeaturePipeline:
         import pandas as pd
         df = pd.DataFrame({"competition_type": ["world_cup", "friendly"]})
         encoded = pipeline.encode_categorical(df)
-        assert encoded["competition_type"].dtype in (np.int32, np.int64, int)
+        assert np.issubdtype(encoded["competition_type"].dtype, np.integer)
 
 
 class TestModelEvaluator:

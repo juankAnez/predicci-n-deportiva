@@ -105,6 +105,7 @@ class NeuralNetworkModel(BaseModel):
             return {"n_iter": self.model.n_iter_, "loss": float(self.model.loss_)}
 
     def predict(self, X: np.ndarray) -> np.ndarray:
+        X = np.nan_to_num(X, nan=0.0)
         if self._use_tf:
             preds = self.model.predict(X, verbose=0)
             if self.task == "classification":
@@ -113,6 +114,7 @@ class NeuralNetworkModel(BaseModel):
         return self.model.predict(X)
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        X = np.nan_to_num(X, nan=0.0)
         if self._use_tf and self.task == "classification":
             return self.model.predict(X, verbose=0)
         if hasattr(self.model, "predict_proba"):

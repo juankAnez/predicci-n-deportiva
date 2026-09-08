@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, Float, ForeignKey, func, UniqueConstraint, Index
+from sqlalchemy import Column, Integer, String, Date, DateTime, Float, ForeignKey, func, UniqueConstraint, Index, text
 
 from src.infrastructure.database.models.base import Base
 
@@ -19,5 +19,5 @@ class RankingModel(Base):
     __table_args__ = (
         UniqueConstraint("team_id", "ranking_type", "rank_date", name="uq_ranking_team_type_date"),
         Index("idx_rankings_team_date", "team_id", "rank_date"),
-        Index("idx_rankings_type_date", "ranking_type", "rank_date.desc()"),
+        Index("idx_rankings_type_date", "ranking_type", text("rank_date DESC")),
     )

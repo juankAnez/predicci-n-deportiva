@@ -82,3 +82,26 @@ class EnsembleModel(BaseModel):
         if self.meta_learner:
             return {f"model_{i}": float(c) for i, c in enumerate(self.meta_learner.coef_[0])}
         return None
+
+    def save(self, path: str):
+        import joblib
+        joblib.dump({
+            "models": self.models,
+            "method": self.method,
+            "meta_learner": self.meta_learner,
+            "model_name": self.model_name,
+            "version": self.version,
+            "feature_names": self.feature_names,
+            "is_trained": self.is_trained,
+        }, path)
+
+    def load(self, path: str):
+        import joblib
+        data = joblib.load(path)
+        self.models = data.get("models", [])
+        self.method = data.get("method", "weighted_average")
+        self.meta_learner = data.get("meta_learner")
+        self.model_name = data.get("model_name", "ensemble")
+        self.version = data.get("version", "1.0.0")
+        self.feature_names = data.get("feature_names", [])
+        self.is_trained = data.get("is_trained", False)

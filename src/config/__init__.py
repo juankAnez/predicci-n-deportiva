@@ -1,9 +1,9 @@
 import os
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from dotenv import load_dotenv
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
@@ -22,9 +22,11 @@ class Settings(BaseSettings):
     DB_PORT: int = int(os.getenv("DB_PORT", "5432"))
     DB_NAME: str = os.getenv("DB_NAME", "prediccion_deportiva")
 
-    @property
-    def DATABASE_URL(self) -> str:
-        return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+    DATABASE_URL: Optional[str] = None
+
+    def model_post_init(self, __context: Any) -> None:
+        if not self.DATABASE_URL:
+            self.DATABASE_URL = f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     # Redis
     REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
@@ -70,9 +72,11 @@ class Settings(BaseSettings):
     SRC_DIR: Path = Path(__file__).resolve().parent.parent
     DATA_DIR: Path = ROOT_DIR / "data"
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        extra="ignore",
+    )
 
 
 settings = Settings()

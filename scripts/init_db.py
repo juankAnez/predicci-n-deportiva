@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 """Initialize database tables"""
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from src.config import settings
 from src.infrastructure.database.connection import engine, init_db
 from src.infrastructure.database.models import Base
