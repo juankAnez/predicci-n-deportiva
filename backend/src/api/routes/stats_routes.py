@@ -1,3 +1,4 @@
+from datetime import date
 from flask import Blueprint, jsonify, request
 
 from src.infrastructure.database.repositories import TeamStatsRepository, MatchRepository, TeamRepository
@@ -12,16 +13,19 @@ team_repo = TeamRepository()
 def get_overview_stats():
     matches = match_repo.get_all()
     teams = team_repo.get_all()
+    today = date.today()
+    upcoming_count = len([m for m in matches if not m.is_finished and m.match_date and m.match_date >= today])
     return jsonify({
         "status": "success",
         "data": {
             "total_matches": len(matches),
             "total_teams": len(teams),
             "finished_matches": len([m for m in matches if m.is_finished]),
+            "upcoming_matches": upcoming_count,
             "models_active": 6,
             "supported_leagues": [
-                {"id": 1, "name": "Premier League", "country": "Inglaterra", "code": "PL"},
-                {"id": 3, "name": "La Liga", "country": "España", "code": "PD"}
+                {"id": "PL", "name": "Premier League", "country": "Inglaterra", "code": "PL"},
+                {"id": "PD", "name": "La Liga", "country": "España", "code": "PD"}
             ]
         }
     })

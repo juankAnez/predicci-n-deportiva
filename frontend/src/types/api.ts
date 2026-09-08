@@ -8,9 +8,10 @@ export interface OverviewStats {
   total_matches: number;
   total_teams: number;
   finished_matches: number;
+  upcoming_matches?: number;
   models_active: number;
   supported_leagues: {
-    id: number;
+    id: string | number;
     name: string;
     country: string;
     code: string;
@@ -20,14 +21,19 @@ export interface OverviewStats {
 export interface Team {
   id: number;
   name: string;
+  full_name?: string;
   short_name?: string;
   country?: string;
+  league?: string;
+  league_code?: string;
+  confederation?: string;
   competition_id?: number;
 }
 
 export interface Match {
   id: number;
   date: string | null;
+  time?: string | null;
   home_team_id: number;
   away_team_id: number;
   home_team_name: string;
@@ -36,7 +42,17 @@ export interface Match {
   away_score: number | null;
   stage: string | null;
   competition_id: number;
+  league?: string;
+  league_code?: string;
+  country?: string;
+  venue?: string | null;
+  stadium?: string | null;
   is_finished: boolean;
+  odds?: {
+    h: number;
+    d: number;
+    a: number;
+  };
 }
 
 export interface MatchesResponse {

@@ -40,7 +40,8 @@ export const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalMatches, setTotalMatches] = useState<number>(0);
-  const [selectedCompetition, setSelectedCompetition] = useState<number | undefined>(undefined);
+  const [selectedLeague, setSelectedLeague] = useState<string | undefined>(undefined);
+  const [statusFilter, setStatusFilter] = useState<"upcoming" | "finished">("upcoming");
 
   // Loaders
   const [loadingOverview, setLoadingOverview] = useState<boolean>(true);
@@ -81,39 +82,51 @@ export const App: React.FC = () => {
     initializeData();
   }, []);
 
-  // Fetch matches on page or competition filter change
+  // Fetch matches on page, league, or status filter change
   useEffect(() => {
+    let isCancelled = false;
+
     const loadMatches = async () => {
       setLoadingMatches(true);
       try {
-        const res = await fetchMatches(currentPage, 12, selectedCompetition);
+        const res = await fetchMatches(currentPage, 12, selectedLeague, undefined, statusFilter);
+        if (isCancelled) return;
+
         setMatches(res.data);
         setTotalPages(res.pagination.pages);
         setTotalMatches(res.pagination.total);
 
-        // Auto-select first match if none selected yet
-        if (!selectedMatch && res.data.length > 0) {
+        // Auto-select first match if available
+        if (res.data.length > 0) {
           handleSelectMatch(res.data[0]);
+        } else {
+          setSelectedMatch(null);
+          setPrediction(null);
         }
       } catch (err) {
         console.error("Error cargando partidos:", err);
       } finally {
-        setLoadingMatches(false);
+        if (!isCancelled) setLoadingMatches(false);
       }
     };
 
     loadMatches();
-  }, [currentPage, selectedCompetition]);
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentPage, selectedLeague, statusFilter]);
 
   // Handle Match Selection
   const handleSelectMatch = async (match: Match) => {
     setSelectedMatch(match);
+    const oddsToUse = match.odds ? { h: match.odds.h, d: match.odds.d, a: match.odds.a } : currentOdds;
+    setCurrentOdds(oddsToUse);
     setLoadingPrediction(true);
     try {
       const pred = await fetchPrediction(match.id, {
-        h_odds: currentOdds.h,
-        d_odds: currentOdds.d,
-        a_odds: currentOdds.a,
+        h_odds: oddsToUse.h,
+        d_odds: oddsToUse.d,
+        a_odds: oddsToUse.a,
       });
       setPrediction(pred);
     } catch (err) {
@@ -168,9 +181,14 @@ export const App: React.FC = () => {
                   currentPage={currentPage}
                   totalPages={totalPages}
                   totalMatches={totalMatches}
-                  selectedCompetition={selectedCompetition}
-                  onSelectCompetition={(compId) => {
-                    setSelectedCompetition(compId);
+                  selectedLeague={selectedLeague}
+                  onSelectLeague={(league) => {
+                    setSelectedLeague(league);
+                    setCurrentPage(1);
+                  }}
+                  statusFilter={statusFilter}
+                  onSelectStatus={(status) => {
+                    setStatusFilter(status);
                     setCurrentPage(1);
                   }}
                   onPageChange={(page) => setCurrentPage(page)}

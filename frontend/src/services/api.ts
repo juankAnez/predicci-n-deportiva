@@ -29,22 +29,27 @@ export async function fetchOverview(): Promise<OverviewStats> {
   return handleResponse<OverviewStats>(res);
 }
 
-export async function fetchTeams(): Promise<Team[]> {
-  const res = await fetch(`${API_BASE_URL}/teams`);
+export async function fetchTeams(league?: string): Promise<Team[]> {
+  const params = new URLSearchParams();
+  if (league) params.set('league', league);
+  const query = params.toString() ? `?${params.toString()}` : '';
+  const res = await fetch(`${API_BASE_URL}/teams${query}`);
   return handleResponse<Team[]>(res);
 }
 
 export async function fetchMatches(
   page: number = 1,
-  perPage: number = 15,
-  competitionId?: number,
-  teamId?: number
+  perPage: number = 12,
+  league?: string,
+  teamId?: number,
+  status?: string
 ): Promise<MatchesResponse> {
   const params = new URLSearchParams();
   params.set('page', page.toString());
   params.set('per_page', perPage.toString());
-  if (competitionId) params.set('competition_id', competitionId.toString());
+  if (league) params.set('league', league);
   if (teamId) params.set('team_id', teamId.toString());
+  if (status) params.set('status', status);
 
   const res = await fetch(`${API_BASE_URL}/matches?${params.toString()}`);
   if (!res.ok) throw new Error('Error al cargar partidos');

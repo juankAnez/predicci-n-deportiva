@@ -1,5 +1,5 @@
 import React from "react";
-import { Trophy, Users, Cpu, TrendingUp } from "lucide-react";
+import { Trophy, Users, Cpu, Flame } from "lucide-react";
 import type { OverviewStats } from "../types/api";
 
 interface OverviewCardsProps {
@@ -10,8 +10,8 @@ interface OverviewCardsProps {
 export const OverviewCards: React.FC<OverviewCardsProps> = ({ stats, loading }) => {
   const cards = [
     {
-      title: "Partidos Analizados",
-      value: stats ? stats.total_matches.toLocaleString() : "2,280",
+      title: "Partidos en Base de Datos",
+      value: stats ? stats.total_matches.toLocaleString() : "2,300",
       subtitle: "La Liga & Premier League",
       icon: Trophy,
       gradient: "from-emerald-500/20 via-emerald-500/5 to-transparent",
@@ -19,9 +19,9 @@ export const OverviewCards: React.FC<OverviewCardsProps> = ({ stats, loading }) 
       borderColor: "border-emerald-500/20",
     },
     {
-      title: "Clubes en Base de Datos",
+      title: "Clubes Registrados",
       value: stats ? stats.total_teams.toString() : "48",
-      subtitle: "Historial y métricas de racha",
+      subtitle: "24 Inglaterra + 24 España",
       icon: Users,
       gradient: "from-teal-500/20 via-teal-500/5 to-transparent",
       iconColor: "text-teal-400",
@@ -30,20 +30,20 @@ export const OverviewCards: React.FC<OverviewCardsProps> = ({ stats, loading }) 
     {
       title: "Modelos AI en Producción",
       value: stats ? stats.models_active.toString() : "6",
-      subtitle: "Ensemble, Poisson, XGBoost, etc.",
+      subtitle: "Ensemble, Poisson, XGBoost",
       icon: Cpu,
       gradient: "from-cyan-500/20 via-cyan-500/5 to-transparent",
       iconColor: "text-cyan-400",
       borderColor: "border-cyan-500/20",
     },
     {
-      title: "Ventaja Estadística (+EV)",
-      value: "Kelly 1/4",
-      subtitle: "Gestión óptima de bankroll",
-      icon: TrendingUp,
-      gradient: "from-indigo-500/20 via-indigo-500/5 to-transparent",
-      iconColor: "text-indigo-400",
-      borderColor: "border-indigo-500/20",
+      title: "Próximos Este Fin de Semana",
+      value: stats?.upcoming_matches ? `${stats.upcoming_matches}` : "20",
+      subtitle: "Listos para calcular +EV con IA",
+      icon: Flame,
+      gradient: "from-amber-500/20 via-amber-500/5 to-transparent",
+      iconColor: "text-amber-400",
+      borderColor: "border-amber-500/20",
     },
   ];
 

@@ -11,6 +11,8 @@ ranking_repo = RankingRepository()
 def list_teams():
     confederation = request.args.get("confederation")
     search = request.args.get("search")
+    league = request.args.get("league")
+    country = request.args.get("country")
 
     if search:
         teams = team_repo.search(search)
@@ -18,6 +20,17 @@ def list_teams():
         teams = team_repo.get_by_confederation(confederation)
     else:
         teams = team_repo.get_all()
+
+    if league:
+        l_upper = league.strip().upper()
+        if l_upper in ("PL", "PREMIER", "PREMIER LEAGUE", "ENG_PL", "ENGLAND"):
+            teams = [t for t in teams if t.country == "England"]
+        elif l_upper in ("PD", "LIGA", "LA LIGA", "ESP_L1", "SPAIN"):
+            teams = [t for t in teams if t.country == "Spain"]
+    elif country:
+        teams = [t for t in teams if t.country and t.country.lower() == country.strip().lower()]
+
+    teams.sort(key=lambda t: t.name)
 
     return jsonify({
         "status": "success",
@@ -29,6 +42,8 @@ def list_teams():
                 "code": t.code,
                 "country": t.country,
                 "confederation": t.confederation,
+                "league": "Premier League" if t.country == "England" else "La Liga",
+                "league_code": "PL" if t.country == "England" else "PD",
                 "logo_url": t.logo_url,
             }
             for t in teams

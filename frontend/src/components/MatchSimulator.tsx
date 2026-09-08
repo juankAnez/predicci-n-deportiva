@@ -13,8 +13,20 @@ interface MatchSimulatorProps {
 }
 
 export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulate }) => {
-  const [homeTeamId, setHomeTeamId] = useState<number>(teams[0]?.id || 1);
-  const [awayTeamId, setAwayTeamId] = useState<number>(teams[1]?.id || 2);
+  const [simLeague, setSimLeague] = useState<"ALL" | "PD" | "PL">("ALL");
+
+  const availableTeams = React.useMemo(() => {
+    if (simLeague === "PD") {
+      return teams.filter((t) => t.country === "Spain" || t.league_code === "PD" || (t.id <= 24 && !t.country));
+    }
+    if (simLeague === "PL") {
+      return teams.filter((t) => t.country === "England" || t.league_code === "PL" || (t.id > 24 && !t.country));
+    }
+    return teams;
+  }, [teams, simLeague]);
+
+  const [homeTeamId, setHomeTeamId] = useState<number>(availableTeams[0]?.id || 1);
+  const [awayTeamId, setAwayTeamId] = useState<number>(availableTeams[1]?.id || 2);
   const [hOdds, setHOdds] = useState<string>("2.10");
   const [dOdds, setDOdds] = useState<string>("3.30");
   const [aOdds, setAOdds] = useState<string>("3.50");
@@ -60,15 +72,6 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
     }
   };
 
-  // Quick preset buttons for popular match-ups
-  const handleSetPreset = (hId: number, aId: number, hO: string, dO: string, aO: string) => {
-    setHomeTeamId(hId);
-    setAwayTeamId(aId);
-    setHOdds(hO);
-    setDOdds(dO);
-    setAOdds(aO);
-  };
-
   // Helper to find team IDs by name
   const findTeamId = (nameQuery: string) => {
     if (!teams || !Array.isArray(teams)) return undefined;
@@ -76,27 +79,35 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
     return t ? t.id : undefined;
   };
 
+  // Quick preset buttons for popular match-ups
+  const handleSetPreset = (hName: string, aName: string, hO: string, dO: string, aO: string) => {
+    const hId = findTeamId(hName);
+    const aId = findTeamId(aName);
+    if (hId && aId) {
+      setHomeTeamId(hId);
+      setAwayTeamId(aId);
+      setHOdds(hO);
+      setDOdds(dO);
+      setAOdds(aO);
+    }
+  };
+
   React.useEffect(() => {
-    if (teams && teams.length >= 2) {
-      if (!homeTeamId || !teams.some((t) => t.id === homeTeamId)) {
-        setHomeTeamId(teams[0].id);
+    if (availableTeams && availableTeams.length >= 2) {
+      if (!availableTeams.some((t) => t.id === homeTeamId)) {
+        setHomeTeamId(availableTeams[0].id);
       }
-      if (!awayTeamId || !teams.some((t) => t.id === awayTeamId)) {
-        setAwayTeamId(teams[1].id);
+      if (!availableTeams.some((t) => t.id === awayTeamId)) {
+        setAwayTeamId(availableTeams[1].id);
       }
     }
-  }, [teams]);
-
-  const elClasicoHome = findTeamId("Real Madrid") || teams[0]?.id || 1;
-  const elClasicoAway = findTeamId("Barcelona") || teams[1]?.id || 2;
-  const premierHome = findTeamId("Arsenal") || teams[2]?.id || 3;
-  const premierAway = findTeamId("Man City") || teams[3]?.id || 4;
+  }, [availableTeams]);
 
   return (
     <div className="space-y-6">
       {/* Simulator Control Panel */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6 backdrop-blur-md">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800/80 pb-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800/80 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="rounded-xl bg-emerald-500/20 p-2 text-emerald-400">
               <Calculator className="h-5 w-5" />
@@ -110,41 +121,100 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
           </div>
 
           {/* Quick Presets */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-slate-500">Clásicos:</span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs text-slate-500 mr-1">Clásicos:</span>
             <button
               type="button"
-              onClick={() => handleSetPreset(elClasicoHome, elClasicoAway, "2.15", "3.60", "3.20")}
+              onClick={() => {
+                setSimLeague("PD");
+                handleSetPreset("Real Madrid", "Barcelona", "2.15", "3.60", "3.20");
+              }}
               className="rounded-lg border border-slate-800 bg-slate-800/50 px-2.5 py-1 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
             >
-              Madrid vs Barcelona
+              🇪🇸 Madrid vs Barça
             </button>
             <button
               type="button"
-              onClick={() => handleSetPreset(premierHome, premierAway, "2.40", "3.40", "2.90")}
+              onClick={() => {
+                setSimLeague("PL");
+                handleSetPreset("Arsenal", "Man City", "2.40", "3.40", "2.90");
+              }}
               className="rounded-lg border border-slate-800 bg-slate-800/50 px-2.5 py-1 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
             >
-              Arsenal vs Man City
+              🏴󠁧󠁢󠁥󠁮󠁧󠁿 Arsenal vs City
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSimLeague("PL");
+                handleSetPreset("Tottenham", "Arsenal", "2.90", "3.60", "2.35");
+              }}
+              className="rounded-lg border border-slate-800 bg-slate-800/50 px-2.5 py-1 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
+            >
+              🏴󠁧󠁢󠁥󠁮󠁧󠁿 Spurs vs Arsenal
             </button>
           </div>
         </div>
 
         {/* Simulation Form */}
         <form onSubmit={handleSimulate} className="mt-5 space-y-5">
+          {/* League Filter Toggle for Simulator */}
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-950/60 p-2 border border-slate-800/80">
+            <span className="text-xs font-semibold text-slate-400 pl-1">
+              Filtrar equipos por competición:
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setSimLeague("ALL")}
+                className={`rounded-lg px-3 py-1 text-xs font-semibold transition-all ${
+                  simLeague === "ALL"
+                    ? "bg-emerald-500 text-slate-950 font-bold"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                }`}
+              >
+                Todas las Ligas ({teams.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setSimLeague("PD")}
+                className={`rounded-lg px-3 py-1 text-xs font-semibold transition-all ${
+                  simLeague === "PD"
+                    ? "bg-amber-500 text-slate-950 font-bold"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                }`}
+              >
+                🇪🇸 La Liga (24)
+              </button>
+              <button
+                type="button"
+                onClick={() => setSimLeague("PL")}
+                className={`rounded-lg px-3 py-1 text-xs font-semibold transition-all ${
+                  simLeague === "PL"
+                    ? "bg-sky-500 text-slate-950 font-bold"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                }`}
+              >
+                🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League (24)
+              </button>
+            </div>
+          </div>
+
           {/* Team Selectors */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Home Team */}
             <div className="rounded-xl border border-slate-800/80 bg-slate-950/50 p-4">
               <label className="text-xs font-bold text-emerald-400 uppercase tracking-wider block mb-1.5">
-                🏠 Equipo Local
+                🏠 Equipo Local ({availableTeams.length} opciones)
               </label>
               <select
                 value={homeTeamId}
                 onChange={(e) => setHomeTeamId(Number(e.target.value))}
                 className="w-full rounded-xl border border-slate-800 bg-slate-900 px-3.5 py-2.5 text-sm font-semibold text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
               >
-                {teams.map((t) => (
+                {availableTeams.map((t) => (
                   <option key={t.id} value={t.id} disabled={t.id === awayTeamId}>
+                    {t.country === "England" ? "🏴󠁧󠁢󠁥󠁮󠁧󠁿 " : "🇪🇸 "}
                     {t.name}
                   </option>
                 ))}
@@ -154,15 +224,16 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
             {/* Away Team */}
             <div className="rounded-xl border border-slate-800/80 bg-slate-950/50 p-4">
               <label className="text-xs font-bold text-indigo-400 uppercase tracking-wider block mb-1.5">
-                ✈️ Equipo Visitante
+                ✈️ Equipo Visitante ({availableTeams.length} opciones)
               </label>
               <select
                 value={awayTeamId}
                 onChange={(e) => setAwayTeamId(Number(e.target.value))}
                 className="w-full rounded-xl border border-slate-800 bg-slate-900 px-3.5 py-2.5 text-sm font-semibold text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
               >
-                {teams.map((t) => (
+                {availableTeams.map((t) => (
                   <option key={t.id} value={t.id} disabled={t.id === homeTeamId}>
+                    {t.country === "England" ? "🏴󠁧󠁢󠁥󠁮󠁧󠁿 " : "🇪🇸 "}
                     {t.name}
                   </option>
                 ))}
