@@ -8,6 +8,7 @@ import {
   RotateCcw,
   Loader2,
   Layers,
+  Users,
 } from "lucide-react";
 import type { PredictionResult } from "../types/api";
 
@@ -17,6 +18,27 @@ interface PredictionDetailProps {
   onRecalculateOdds: (hOdds: number, dOdds: number, aOdds: number) => void;
   initialOdds?: { h?: number; d?: number; a?: number };
 }
+
+const getPosBadge = (pos: string) => {
+  switch (pos?.toUpperCase()) {
+    case "GK":
+      return "bg-amber-500/20 text-amber-300 border-amber-500/30";
+    case "DF":
+      return "bg-sky-500/20 text-sky-300 border-sky-500/30";
+    case "MF":
+      return "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
+    case "FW":
+      return "bg-rose-500/20 text-rose-300 border-rose-500/30";
+    default:
+      return "bg-slate-700/50 text-slate-300 border-slate-600";
+  }
+};
+
+const formatMarketVal = (eur: number) => {
+  if (!eur) return "—";
+  if (eur >= 1_000_000) return `€${(eur / 1_000_000).toFixed(0)}M`;
+  return `€${(eur / 1_000).toFixed(0)}K`;
+};
 
 export const PredictionDetail: React.FC<PredictionDetailProps> = ({
   prediction,
@@ -445,6 +467,112 @@ export const PredictionDetail: React.FC<PredictionDetailProps> = ({
           </div>
         )}
       </div>
+
+      {/* Squad Comparison & Star Players */}
+      {prediction.squad_analysis && (
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 backdrop-blur-md">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800/80 pb-3.5">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-emerald-400" />
+              <h3 className="text-sm font-bold text-white">
+                Duelo de Plantillas & Figuras Clave
+              </h3>
+            </div>
+            <div className="flex items-center gap-3 text-xs">
+              <span className="text-slate-400">
+                Diferencial de Calidad:{" "}
+                <span
+                  className={`font-mono font-bold ${
+                    prediction.squad_analysis.rating_diff >= 0
+                      ? "text-emerald-400"
+                      : "text-rose-400"
+                  }`}
+                >
+                  {prediction.squad_analysis.rating_diff >= 0
+                    ? `+${prediction.squad_analysis.rating_diff}`
+                    : prediction.squad_analysis.rating_diff} pts
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Home Squad */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-emerald-400">
+                  {teams.home}
+                </span>
+                <span className="text-[11px] font-mono text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                  ⭐ Media: {prediction.squad_analysis.home_avg_rating.toFixed(2)}
+                </span>
+              </div>
+              <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+                {prediction.squad_analysis.home_squad.slice(0, 7).map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/40 p-2 text-xs"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`rounded px-1 py-0.5 text-[9px] font-extrabold border ${getPosBadge(
+                          p.position
+                        )}`}
+                      >
+                        {p.position}
+                      </span>
+                      <span className="font-semibold text-white truncate max-w-[120px]">
+                        {p.name}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px]">
+                      <span className="text-slate-400">{formatMarketVal(p.market_value_eur)}</span>
+                      <span className="font-mono font-bold text-amber-400">⭐ {p.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Away Squad */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-indigo-400">
+                  {teams.away}
+                </span>
+                <span className="text-[11px] font-mono text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded-md border border-indigo-500/20">
+                  ⭐ Media: {prediction.squad_analysis.away_avg_rating.toFixed(2)}
+                </span>
+              </div>
+              <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+                {prediction.squad_analysis.away_squad.slice(0, 7).map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/40 p-2 text-xs"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`rounded px-1 py-0.5 text-[9px] font-extrabold border ${getPosBadge(
+                          p.position
+                        )}`}
+                      >
+                        {p.position}
+                      </span>
+                      <span className="font-semibold text-white truncate max-w-[120px]">
+                        {p.name}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px]">
+                      <span className="text-slate-400">{formatMarketVal(p.market_value_eur)}</span>
+                      <span className="font-mono font-bold text-amber-400">⭐ {p.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Feature Importance / Key Factors (Explainability) */}
       {explanation && explanation.top_features && explanation.top_features.length > 0 && (

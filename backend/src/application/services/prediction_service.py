@@ -86,7 +86,47 @@ class PredictionService:
             return sorted(files)[-1]
         return None
 
-    def predict_match(self, match_id: int, odds: Optional[BettingOdds] = None) -> Dict[str, Any]:
+    def _get_squad_data(self, team_id: int, benched_ids: Optional[List[int]] = None) -> Dict[str, Any]:
+        from src.infrastructure.database.models import PlayerModel, PlayerStatsModel
+        from src.infrastructure.database.connection import db_session
+
+        benched_set = set(benched_ids or [])
+        db = db_session()
+        try:
+            players = db.query(PlayerModel).filter(PlayerModel.team_id == team_id).all()
+            roster = []
+            active_ratings = []
+            for p in players:
+                stat = db.query(PlayerStatsModel).filter(PlayerStatsModel.player_id == p.id).first()
+                rating = stat.rating if stat and stat.rating else 7.2
+                is_active = p.id not in benched_set
+                if is_active:
+                    active_ratings.append(rating)
+                roster.append({
+                    "id": p.id,
+                    "name": p.name,
+                    "position": p.position,
+                    "shirt_number": p.shirt_number,
+                    "rating": rating,
+                    "market_value_eur": p.market_value_eur,
+                    "is_active": is_active,
+                    "goals": stat.goals if stat else 0,
+                    "assists": stat.assists if stat else 0,
+                    "xg": stat.xg if stat else 0.0,
+                })
+            roster.sort(key=lambda x: ({"GK": 0, "DF": 1, "MF": 2, "FW": 3}.get(x["position"], 4), -x["rating"]))
+            avg_rating = float(np.mean(active_ratings)) if active_ratings else 7.2
+            return {
+                "players": roster,
+                "avg_rating": round(avg_rating, 2),
+                "active_count": len(active_ratings),
+            }
+        finally:
+            db.close()
+
+    def predict_match(self, match_id: int, odds: Optional[BettingOdds] = None,
+                      benched_home: Optional[List[int]] = None,
+                      benched_away: Optional[List[int]] = None) -> Dict[str, Any]:
         match = self.match_repo.get_by_id(match_id)
         if not match:
             raise ValueError(f"Match {match_id} no encontrado")
@@ -122,6 +162,19 @@ class PredictionService:
         else:
             proba = np.array([0.45, 0.25, 0.30])
 
+        # Squad analysis & player ratings adjustment
+        squad_h = self._get_squad_data(match.home_team_id, benched_home)
+        squad_a = self._get_squad_data(match.away_team_id, benched_away)
+        rating_diff = round(squad_h["avg_rating"] - squad_a["avg_rating"], 2)
+
+        # Shift probabilities according to rating delta
+        shift = float(rating_diff * 0.04)
+        proba[0] = max(0.05, proba[0] + shift)
+        proba[2] = max(0.05, proba[2] - shift)
+        p_sum = float(np.sum(proba))
+        if p_sum > 0:
+            proba = proba / p_sum
+
         pred_class = int(np.argmax(proba))
         result_map = {0: "H", 1: "D", 2: "A"}
 
@@ -149,6 +202,14 @@ class PredictionService:
             }]))[0]
             home_goals_exp = float(exp[0])
             away_goals_exp = float(exp[1])
+
+        # Adjust goals with squad ratings
+        if rating_diff > 0:
+            home_goals_exp = round(max(0.2, home_goals_exp + rating_diff * 0.2), 2)
+            away_goals_exp = round(max(0.1, away_goals_exp - rating_diff * 0.1), 2)
+        elif rating_diff < 0:
+            home_goals_exp = round(max(0.1, home_goals_exp + rating_diff * 0.1), 2)
+            away_goals_exp = round(max(0.2, away_goals_exp - rating_diff * 0.2), 2)
 
         over_under = {}
         if poisson_model:
@@ -202,11 +263,20 @@ class PredictionService:
             "away": away_team_name,
         }
         resp["market_analysis"] = market_analysis
+        resp["squad_analysis"] = {
+            "home_squad": squad_h["players"],
+            "away_squad": squad_a["players"],
+            "home_avg_rating": squad_h["avg_rating"],
+            "away_avg_rating": squad_a["avg_rating"],
+            "rating_diff": rating_diff,
+        }
         return resp
 
     def predict_teams(self, home_team_id: int, away_team_id: int,
                       odds: Optional[BettingOdds] = None,
-                      match_date: Optional[date] = None) -> Dict[str, Any]:
+                      match_date: Optional[date] = None,
+                      benched_home: Optional[List[int]] = None,
+                      benched_away: Optional[List[int]] = None) -> Dict[str, Any]:
         match_date = match_date or date.today()
         features = self.feature_service.generate_features_for_match(
             home_team_id, away_team_id, match_date
@@ -236,6 +306,19 @@ class PredictionService:
         else:
             proba = np.array([0.45, 0.25, 0.30])
 
+        # Squad analysis & player ratings adjustment
+        squad_h = self._get_squad_data(home_team_id, benched_home)
+        squad_a = self._get_squad_data(away_team_id, benched_away)
+        rating_diff = round(squad_h["avg_rating"] - squad_a["avg_rating"], 2)
+
+        # Shift probabilities according to rating delta
+        shift = float(rating_diff * 0.04)
+        proba[0] = max(0.05, proba[0] + shift)
+        proba[2] = max(0.05, proba[2] - shift)
+        p_sum = float(np.sum(proba))
+        if p_sum > 0:
+            proba = proba / p_sum
+
         pred_class = int(np.argmax(proba))
         result_map = {0: "H", 1: "D", 2: "A"}
 
@@ -261,6 +344,14 @@ class PredictionService:
             }]))[0]
             home_goals_exp = float(exp[0])
             away_goals_exp = float(exp[1])
+
+        # Adjust goals with squad ratings
+        if rating_diff > 0:
+            home_goals_exp = round(max(0.2, home_goals_exp + rating_diff * 0.2), 2)
+            away_goals_exp = round(max(0.1, away_goals_exp - rating_diff * 0.1), 2)
+        elif rating_diff < 0:
+            home_goals_exp = round(max(0.1, home_goals_exp + rating_diff * 0.1), 2)
+            away_goals_exp = round(max(0.2, away_goals_exp - rating_diff * 0.2), 2)
 
         over_under = {}
         if poisson_model:
@@ -307,6 +398,13 @@ class PredictionService:
             "away": away_team_name,
         }
         resp["market_analysis"] = market_analysis
+        resp["squad_analysis"] = {
+            "home_squad": squad_h["players"],
+            "away_squad": squad_a["players"],
+            "home_avg_rating": squad_h["avg_rating"],
+            "away_avg_rating": squad_a["avg_rating"],
+            "rating_diff": rating_diff,
+        }
         return resp
 
     def _format_response(self, prediction: Prediction, explanation: Dict[str, Any],

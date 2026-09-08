@@ -5,6 +5,7 @@ import type {
   MatchesResponse,
   PredictionResult,
   ModelRecord,
+  Player,
 } from '../types/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
@@ -56,15 +57,28 @@ export async function fetchMatches(
   return res.json();
 }
 
+export async function fetchTeamPlayers(teamId: number): Promise<Player[]> {
+  const res = await fetch(`${API_BASE_URL}/players/team/${teamId}`);
+  return handleResponse<Player[]>(res);
+}
+
 export async function fetchPrediction(
   matchId: number,
-  odds?: { h_odds?: number; d_odds?: number; a_odds?: number }
+  odds?: { h_odds?: number; d_odds?: number; a_odds?: number },
+  benchedHome?: number[],
+  benchedAway?: number[]
 ): Promise<PredictionResult> {
   const params = new URLSearchParams();
   if (odds?.h_odds && odds?.d_odds && odds?.a_odds) {
     params.set('h_odds', odds.h_odds.toString());
     params.set('d_odds', odds.d_odds.toString());
     params.set('a_odds', odds.a_odds.toString());
+  }
+  if (benchedHome && benchedHome.length > 0) {
+    params.set('benched_home', benchedHome.join(','));
+  }
+  if (benchedAway && benchedAway.length > 0) {
+    params.set('benched_away', benchedAway.join(','));
   }
   const query = params.toString() ? `?${params.toString()}` : '';
   const res = await fetch(`${API_BASE_URL}/predictions/${matchId}${query}`);
@@ -74,7 +88,9 @@ export async function fetchPrediction(
 export async function simulateMatch(
   homeTeamId: number,
   awayTeamId: number,
-  odds?: { h_odds?: number; d_odds?: number; a_odds?: number }
+  odds?: { h_odds?: number; d_odds?: number; a_odds?: number },
+  benchedHome?: number[],
+  benchedAway?: number[]
 ): Promise<PredictionResult> {
   const body: Record<string, any> = {
     home_team_id: homeTeamId,
@@ -85,6 +101,12 @@ export async function simulateMatch(
     body.d_odds = odds.d_odds;
     body.a_odds = odds.a_odds;
   }
+  if (benchedHome && benchedHome.length > 0) {
+    body.benched_home = benchedHome;
+  }
+  if (benchedAway && benchedAway.length > 0) {
+    body.benched_away = benchedAway;
+  }
 
   const res = await fetch(`${API_BASE_URL}/predictions/simulate`, {
     method: 'POST',
@@ -92,6 +114,43 @@ export async function simulateMatch(
     body: JSON.stringify(body),
   });
   return handleResponse<PredictionResult>(res);
+}
+
+export async function submitMatchResult(
+  matchId: number,
+  homeScore: number,
+  awayScore: number
+): Promise<{ match_id: number; home_score: number; away_score: number; is_finished: boolean }> {
+  const res = await fetch(`${API_BASE_URL}/matches/${matchId}/result`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ home_score: homeScore, away_score: awayScore }),
+  });
+  return handleResponse(res);
+}
+
+export async function recordPlayerMatchStats(
+  playerId: number,
+  matchId: number,
+  stats: {
+    team_id: number;
+    position?: string;
+    rating: number;
+    goals?: number;
+    assists?: number;
+    xg?: number;
+    xa?: number;
+    passes_total?: number;
+    passing_accuracy?: number;
+    tackles?: number;
+  }
+): Promise<{ player_id: number; new_overall_rating: number }> {
+  const res = await fetch(`${API_BASE_URL}/players/${playerId}/stats`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ match_id: matchId, ...stats }),
+  });
+  return handleResponse(res);
 }
 
 export async function fetchModels(): Promise<ModelRecord[]> {

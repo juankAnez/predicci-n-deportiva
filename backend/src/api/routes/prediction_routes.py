@@ -8,18 +8,32 @@ prediction_service = PredictionService()
 prediction_repo = PredictionRepository()
 
 
+def _parse_benched_ids(val):
+    if not val:
+        return []
+    if isinstance(val, list):
+        return [int(x) for x in val if str(x).isdigit()]
+    if isinstance(val, str):
+        return [int(x.strip()) for x in val.split(",") if x.strip().isdigit()]
+    return []
+
+
 @prediction_bp.route("/<int:match_id>", methods=["GET"])
 def get_prediction(match_id: int):
     try:
         h_odds = request.args.get("h_odds", type=float)
         d_odds = request.args.get("d_odds", type=float)
         a_odds = request.args.get("a_odds", type=float)
+        benched_home = _parse_benched_ids(request.args.get("benched_home"))
+        benched_away = _parse_benched_ids(request.args.get("benched_away"))
         odds = None
         if h_odds and d_odds and a_odds:
             from src.domain.value_objects.betting_market import BettingOdds
             odds = BettingOdds(home_win=h_odds, draw=d_odds, away_win=a_odds)
 
-        result = prediction_service.predict_match(match_id, odds=odds)
+        result = prediction_service.predict_match(
+            match_id, odds=odds, benched_home=benched_home, benched_away=benched_away
+        )
         return jsonify({"status": "success", "data": result})
     except ValueError as e:
         return jsonify({"status": "error", "error": str(e)}), 404
@@ -37,12 +51,16 @@ def simulate_match():
             h_odds = payload.get("h_odds")
             d_odds = payload.get("d_odds")
             a_odds = payload.get("a_odds")
+            benched_home = _parse_benched_ids(payload.get("benched_home"))
+            benched_away = _parse_benched_ids(payload.get("benched_away"))
         else:
             home_team_id = request.args.get("home_team_id", type=int, default=0)
             away_team_id = request.args.get("away_team_id", type=int, default=0)
             h_odds = request.args.get("h_odds", type=float)
             d_odds = request.args.get("d_odds", type=float)
             a_odds = request.args.get("a_odds", type=float)
+            benched_home = _parse_benched_ids(request.args.get("benched_home"))
+            benched_away = _parse_benched_ids(request.args.get("benched_away"))
 
         if not home_team_id or not away_team_id:
             return jsonify({"status": "error", "error": "home_team_id y away_team_id son requeridos"}), 400
@@ -52,7 +70,13 @@ def simulate_match():
             from src.domain.value_objects.betting_market import BettingOdds
             odds = BettingOdds(home_win=float(h_odds), draw=float(d_odds), away_win=float(a_odds))
 
-        result = prediction_service.predict_teams(home_team_id, away_team_id, odds=odds)
+        result = prediction_service.predict_teams(
+            home_team_id,
+            away_team_id,
+            odds=odds,
+            benched_home=benched_home,
+            benched_away=benched_away,
+        )
         return jsonify({"status": "success", "data": result})
     except ValueError as e:
         return jsonify({"status": "error", "error": str(e)}), 400

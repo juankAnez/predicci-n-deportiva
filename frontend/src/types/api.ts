@@ -102,6 +102,33 @@ export interface MarketAnalysis {
   best_bet: BestBet | null;
 }
 
+export interface Player {
+  id: number;
+  name: string;
+  full_name?: string;
+  team_id: number;
+  position: 'GK' | 'DF' | 'MF' | 'FW' | string;
+  shirt_number?: number;
+  age?: number;
+  nationality?: string;
+  market_value_eur: number;
+  rating: number;
+  goals: number;
+  assists: number;
+  xg?: number;
+  xa?: number;
+  tackles?: number;
+  passing_accuracy?: number;
+}
+
+export interface SquadAnalysis {
+  home_squad: Player[];
+  away_squad: Player[];
+  home_avg_rating: number;
+  away_avg_rating: number;
+  rating_diff: number;
+}
+
 export interface PredictionResult {
   match_id: number;
   prediction_date: string;
@@ -138,6 +165,7 @@ export interface PredictionResult {
     std_dev: number;
   };
   market_analysis?: MarketAnalysis | null;
+  squad_analysis?: SquadAnalysis | null;
 }
 
 export interface ModelRecord {
