@@ -6,6 +6,7 @@ import { PredictionDetail } from "./components/PredictionDetail";
 import { MatchSimulator } from "./components/MatchSimulator";
 import { ModelsView } from "./components/ModelsView";
 import { GuideView } from "./components/GuideView";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import {
   fetchOverview,
   fetchTeams,
@@ -156,56 +157,58 @@ export const App: React.FC = () => {
         <OverviewCards stats={overview} loading={loadingOverview} />
 
         {/* Tab Content */}
-        {activeTab === "matches" && (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
-            {/* Left: Matches List (7 cols on lg) */}
-            <div className="lg:col-span-7">
-              <MatchList
-                matches={matches}
-                loading={loadingMatches}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalMatches={totalMatches}
-                selectedCompetition={selectedCompetition}
-                onSelectCompetition={(compId) => {
-                  setSelectedCompetition(compId);
-                  setCurrentPage(1);
-                }}
-                onPageChange={(page) => setCurrentPage(page)}
-                onSelectMatch={handleSelectMatch}
-                selectedMatchId={selectedMatch?.id}
-              />
+        <ErrorBoundary fallbackTitle="Error al cargar la sección">
+          {activeTab === "matches" && (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
+              {/* Left: Matches List (7 cols on lg) */}
+              <div className="lg:col-span-7">
+                <MatchList
+                  matches={matches}
+                  loading={loadingMatches}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalMatches={totalMatches}
+                  selectedCompetition={selectedCompetition}
+                  onSelectCompetition={(compId) => {
+                    setSelectedCompetition(compId);
+                    setCurrentPage(1);
+                  }}
+                  onPageChange={(page) => setCurrentPage(page)}
+                  onSelectMatch={handleSelectMatch}
+                  selectedMatchId={selectedMatch?.id}
+                />
+              </div>
+
+              {/* Right: Detailed Prediction & +EV Analysis (5 cols on lg) */}
+              <div className="lg:col-span-5 lg:sticky lg:top-20">
+                <PredictionDetail
+                  prediction={prediction}
+                  loading={loadingPrediction}
+                  onRecalculateOdds={handleRecalculateOdds}
+                  initialOdds={currentOdds}
+                />
+              </div>
             </div>
+          )}
 
-            {/* Right: Detailed Prediction & +EV Analysis (5 cols on lg) */}
-            <div className="lg:col-span-5 lg:sticky lg:top-20">
-              <PredictionDetail
-                prediction={prediction}
-                loading={loadingPrediction}
-                onRecalculateOdds={handleRecalculateOdds}
-                initialOdds={currentOdds}
-              />
-            </div>
-          </div>
-        )}
+          {activeTab === "simulator" && (
+            <MatchSimulator
+              teams={teams}
+              onSimulate={simulateMatch}
+            />
+          )}
 
-        {activeTab === "simulator" && (
-          <MatchSimulator
-            teams={teams}
-            onSimulate={simulateMatch}
-          />
-        )}
+          {activeTab === "models" && (
+            <ModelsView
+              models={models}
+              loading={loadingModels}
+            />
+          )}
 
-        {activeTab === "models" && (
-          <ModelsView
-            models={models}
-            loading={loadingModels}
-          />
-        )}
-
-        {activeTab === "guide" && (
-          <GuideView />
-        )}
+          {activeTab === "guide" && (
+            <GuideView />
+          )}
+        </ErrorBoundary>
       </main>
 
       {/* Footer */}

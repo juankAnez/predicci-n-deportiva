@@ -71,14 +71,26 @@ export const MatchSimulator: React.FC<MatchSimulatorProps> = ({ teams, onSimulat
 
   // Helper to find team IDs by name
   const findTeamId = (nameQuery: string) => {
-    const t = teams.find((item) => item.name.toLowerCase().includes(nameQuery.toLowerCase()));
+    if (!teams || !Array.isArray(teams)) return undefined;
+    const t = teams.find((item) => (item?.name || "").toLowerCase().includes(nameQuery.toLowerCase()));
     return t ? t.id : undefined;
   };
 
-  const elClasicoHome = findTeamId("Real Madrid") || 1;
-  const elClasicoAway = findTeamId("Barcelona") || 2;
-  const premierHome = findTeamId("Arsenal") || 3;
-  const premierAway = findTeamId("Man City") || 4;
+  React.useEffect(() => {
+    if (teams && teams.length >= 2) {
+      if (!homeTeamId || !teams.some((t) => t.id === homeTeamId)) {
+        setHomeTeamId(teams[0].id);
+      }
+      if (!awayTeamId || !teams.some((t) => t.id === awayTeamId)) {
+        setAwayTeamId(teams[1].id);
+      }
+    }
+  }, [teams]);
+
+  const elClasicoHome = findTeamId("Real Madrid") || teams[0]?.id || 1;
+  const elClasicoAway = findTeamId("Barcelona") || teams[1]?.id || 2;
+  const premierHome = findTeamId("Arsenal") || teams[2]?.id || 3;
+  const premierAway = findTeamId("Man City") || teams[3]?.id || 4;
 
   return (
     <div className="space-y-6">

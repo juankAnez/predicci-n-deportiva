@@ -47,6 +47,18 @@ export const ModelsView: React.FC<ModelsViewProps> = ({ models, loading }) => {
     },
   };
 
+  // Deduplicate models by model_name keeping latest version
+  const uniqueModels = React.useMemo(() => {
+    if (!models || !Array.isArray(models)) return [];
+    const map = new Map<string, ModelRecord>();
+    for (const m of models) {
+      if (m && m.model_name && !map.has(m.model_name)) {
+        map.set(m.model_name, m);
+      }
+    }
+    return Array.from(map.values());
+  }, [models]);
+
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur-md">
@@ -69,9 +81,13 @@ export const ModelsView: React.FC<ModelsViewProps> = ({ models, loading }) => {
             <div key={i} className="h-56 animate-pulse rounded-2xl border border-slate-800 bg-slate-900/40 p-5" />
           ))}
         </div>
+      ) : uniqueModels.length === 0 ? (
+        <div className="flex h-48 flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 py-8 text-center">
+          <p className="text-sm font-medium text-slate-400">No se encontraron modelos registrados.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {models.map((model) => {
+          {uniqueModels.map((model) => {
             const info = modelDescriptions[model.model_name] || {
               desc: "Modelo estadístico para predicción de resultados deportivos.",
               icon: Cpu,

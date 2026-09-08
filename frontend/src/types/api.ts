@@ -112,7 +112,7 @@ export interface PredictionResult {
     [key: string]: number;
   };
   explanation: {
-    top_features: [string, number][];
+    top_features: ([string, number] | { name: string; importance: number })[];
     method: string;
     summary: string;
   };

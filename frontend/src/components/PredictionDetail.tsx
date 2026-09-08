@@ -255,17 +255,18 @@ export const PredictionDetail: React.FC<PredictionDetailProps> = ({
           </div>
 
           <div className="mt-4 space-y-2.5">
-            {Object.entries(over_under).map(([market, prob]) => {
+            {Object.entries(over_under || {}).map(([market, prob]) => {
+              const safeProb = typeof prob === "number" ? prob : parseFloat(String(prob)) || 0;
               const label = market.replace("over_", "Más de ").replace("_", " ") + " Goles";
               return (
                 <div key={market} className="space-y-1">
                   <div className="flex justify-between text-xs">
                     <span className="text-slate-300 font-medium">{label}</span>
-                    <span className="font-bold text-white">{prob}%</span>
+                    <span className="font-bold text-white">{safeProb}%</span>
                   </div>
                   <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800">
                     <div
-                      style={{ width: `${prob}%` }}
+                      style={{ width: `${Math.min(100, Math.max(0, safeProb))}%` }}
                       className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-500"
                     />
                   </div>
@@ -388,7 +389,7 @@ export const PredictionDetail: React.FC<PredictionDetailProps> = ({
         )}
 
         {/* Market Opportunities Cards */}
-        {market_analysis && (
+        {market_analysis && Array.isArray(market_analysis.opportunities) && (
           <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {market_analysis.opportunities.map((opp) => {
               const isPositive = opp.has_value;
@@ -454,7 +455,10 @@ export const PredictionDetail: React.FC<PredictionDetailProps> = ({
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-            {explanation.top_features.slice(0, 6).map(([featureName, impact], idx) => {
+            {explanation.top_features.slice(0, 6).map((item: any, idx: number) => {
+              const featureName: string = Array.isArray(item) ? String(item[0] || "") : String(item?.name || "");
+              const impact: number = Array.isArray(item) ? Number(item[1] || 0) : Number(item?.importance || 0);
+
               const cleanName = featureName
                 .replace("elo_rating_home", "Elo Rating Local")
                 .replace("elo_rating_away", "Elo Rating Visitante")
@@ -466,7 +470,9 @@ export const PredictionDetail: React.FC<PredictionDetailProps> = ({
 
               return (
                 <div key={idx} className="flex items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/40 p-3 text-xs">
-                  <span className="text-slate-300 font-medium truncate max-w-[180px]">{cleanName}</span>
+                  <span className="text-slate-300 font-medium truncate max-w-[180px]">
+                    {cleanName || `Factor ${idx + 1}`}
+                  </span>
                   <span className="font-mono font-bold text-emerald-400">{Math.round(impact)} pts</span>
                 </div>
               );
