@@ -138,3 +138,4 @@ export const ModelsView: React.FC<ModelsViewProps> = ({ models, loading }) => {
     </div>
   );
 };
+

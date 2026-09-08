@@ -63,3 +63,4 @@ def test_api_simulate_endpoint(client):
     assert "teams" in pred
     assert "result" in pred
     assert "market_analysis" in pred
+
