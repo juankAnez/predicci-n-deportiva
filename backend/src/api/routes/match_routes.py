@@ -9,28 +9,29 @@ team_repo = TeamRepository()
 
 
 DEFAULT_MATCH_ODDS = {
-    # Premier League
-    (36, 41): {"h": 4.50, "d": 3.90, "a": 1.75},  # Southampton vs Man United
-    (42, 48): {"h": 1.55, "d": 4.40, "a": 5.80},  # Brighton vs Ipswich
-    (25, 39): {"h": 1.62, "d": 4.10, "a": 5.25},  # Crystal Palace vs Leicester
-    (27, 43): {"h": 2.40, "d": 3.50, "a": 2.90},  # Fulham vs West Ham
-    (28, 34): {"h": 1.22, "d": 6.80, "a": 12.00}, # Liverpool vs Nott'm Forest
-    (44, 40): {"h": 1.18, "d": 7.50, "a": 14.00}, # Man City vs Brentford
-    (30, 37): {"h": 1.50, "d": 4.50, "a": 6.20},  # Aston Villa vs Everton
-    (29, 38): {"h": 3.40, "d": 3.80, "a": 2.05},  # Bournemouth vs Chelsea
-    (35, 26): {"h": 2.90, "d": 3.60, "a": 2.35},  # Tottenham vs Arsenal
-    (32, 33): {"h": 3.30, "d": 3.70, "a": 2.10},  # Wolves vs Newcastle
-    # La Liga
-    (19, 24): {"h": 1.68, "d": 3.70, "a": 5.50},  # Betis vs Leganes
-    (16, 6):  {"h": 3.10, "d": 3.30, "a": 2.35},  # Mallorca vs Villarreal
-    (4, 22):  {"h": 2.65, "d": 3.10, "a": 2.90},  # Espanol vs Alaves
-    (2, 17):  {"h": 2.15, "d": 3.10, "a": 3.80},  # Sevilla vs Getafe
-    (10, 14): {"h": 4.33, "d": 3.75, "a": 1.80},  # Sociedad vs Real Madrid
-    (3, 5):   {"h": 1.70, "d": 3.80, "a": 5.00},  # Celta vs Valladolid
+    # Premier League (Gameweek 4: Sept 12-14, 2026)
+    (29, 40): {"h": 2.30, "d": 3.50, "a": 3.00},  # Bournemouth vs Brentford
+    (30, 34): {"h": 1.65, "d": 4.00, "a": 5.00},  # Aston Villa vs Nott'm Forest
+    (25, 48): {"h": 1.80, "d": 3.75, "a": 4.40},  # Crystal Palace vs Ipswich
+    (28, 27): {"h": 1.25, "d": 6.50, "a": 10.00}, # Liverpool vs Fulham
+    (35, 37): {"h": 1.55, "d": 4.40, "a": 5.50},  # Tottenham vs Everton
+    (42, 38): {"h": 3.20, "d": 3.70, "a": 2.15},  # Brighton vs Chelsea
+    (36, 26): {"h": 6.50, "d": 4.50, "a": 1.48},  # Southampton vs Arsenal
+    (41, 44): {"h": 3.80, "d": 3.80, "a": 1.90},  # Man United vs Man City (Manchester Derby)
+    (32, 43): {"h": 2.50, "d": 3.40, "a": 2.80},  # Wolves vs West Ham
+    (31, 33): {"h": 3.10, "d": 3.50, "a": 2.25},  # Leeds vs Newcastle
+
+    # La Liga (Jornada 5: Sept 11-14, 2026)
+    (2, 11):  {"h": 2.15, "d": 3.25, "a": 3.50},  # Sevilla vs Valencia
+    (22, 21): {"h": 2.05, "d": 3.20, "a": 3.90},  # Alaves vs Las Palmas
+    (14, 8):  {"h": 1.22, "d": 6.50, "a": 12.00}, # Real Madrid vs Rayo Vallecano
+    (6, 19):  {"h": 2.10, "d": 3.50, "a": 3.40},  # Villarreal vs Betis
+    (16, 3):  {"h": 2.40, "d": 3.10, "a": 3.20},  # Mallorca vs Celta
+    (17, 24): {"h": 2.00, "d": 3.00, "a": 4.30},  # Getafe vs Leganes
+    (15, 20): {"h": 1.50, "d": 4.20, "a": 6.80},  # Ath Bilbao vs Elche
+    (10, 18): {"h": 2.90, "d": 3.20, "a": 2.55},  # Sociedad vs Ath Madrid
     (12, 7):  {"h": 3.90, "d": 3.90, "a": 1.85},  # Girona vs Barcelona
-    (21, 15): {"h": 3.75, "d": 3.40, "a": 2.05},  # Las Palmas vs Ath Bilbao
-    (18, 11): {"h": 1.35, "d": 5.00, "a": 9.50},  # Ath Madrid vs Valencia
-    (8, 1):   {"h": 2.10, "d": 3.20, "a": 3.80},  # Vallecano vs Osasuna
+    (1, 4):   {"h": 1.95, "d": 3.30, "a": 4.20},  # Osasuna vs Espanol
 }
 
 
