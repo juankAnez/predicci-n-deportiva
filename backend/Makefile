@@ -18,43 +18,43 @@ help:
 	@echo "  make docker-down  Detener servicios Docker"
 
 install:
-	pip install -r backend/requirements.txt
+	pip install -r requirements.txt
 
 dev: install
-	pip install -r backend/requirements-dev.txt
+	pip install -r requirements-dev.txt
 
 init-db:
-	python backend/scripts/init_db.py
+	python scripts/init_db.py
 
 train:
-	python backend/scripts/train_models.py
+	python scripts/train_models.py
 
 predict:
-	python backend/scripts/run_prediction.py $(MATCH_ID)
+	python scripts/run_prediction.py $(MATCH_ID)
 
 run:
-	python -m backend.src.api.app
+	python -m src.api.app
 
 scrape:
-	python backend/scripts/run_scraping.py
+	python scripts/run_scraping.py
 
 scheduler:
-	python -m backend.src.etl.scheduler
+	python -m src.etl.scheduler
 
 test:
-	pytest backend/tests/ -v --cov=backend/src --cov-report=term
+	pytest tests/ -v --cov=src --cov-report=term
 
 lint:
-	flake8 backend/src/ backend/tests/
+	flake8 src/ tests/
 
 typecheck:
-	mypy backend/src/
+	mypy src/
 
 clean:
-	rm -rf backend/data/raw/*
-	rm -rf backend/data/processed/*
-	rm -rf backend/data/cache/*
-	rm -rf backend/data/exports/*
+	rm -rf data/raw/*
+	rm -rf data/processed/*
+	rm -rf data/cache/*
+	rm -rf data/exports/*
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete
 

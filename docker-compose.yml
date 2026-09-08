@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme123}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./backend/infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     healthcheck:
@@ -34,7 +34,7 @@ services:
 
   api:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
@@ -51,13 +51,13 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - ./data:/app/data
-      - ./src:/app/src
+      - ./backend/data:/app/data
+      - ./backend/src:/app/src
     restart: unless-stopped
 
   worker:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile.worker
     environment:
       DB_HOST: postgres
@@ -72,13 +72,13 @@ services:
       - postgres
       - redis
     volumes:
-      - ./data:/app/data
-      - ./src:/app/src
+      - ./backend/data:/app/data
+      - ./backend/src:/app/src
     restart: unless-stopped
 
   scheduler:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile.worker
     environment:
       DB_HOST: postgres
@@ -93,8 +93,8 @@ services:
       - postgres
       - redis
     volumes:
-      - ./data:/app/data
-      - ./src:/app/src
+      - ./backend/data:/app/data
+      - ./backend/src:/app/src
     command: python -m src.etl.scheduler
     restart: unless-stopped
 
@@ -103,8 +103,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./src/static:/app/static
+      - ./backend/infra/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./backend/src/static:/app/static
     depends_on:
       - api
     restart: unless-stopped

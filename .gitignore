@@ -38,6 +38,18 @@ data/logs/*
 !data/cache/.gitkeep
 !data/exports/.gitkeep
 !data/logs/.gitkeep
+backend/data/raw/*
+backend/data/processed/*
+backend/data/models/*
+backend/data/cache/*
+backend/data/exports/*
+backend/data/logs/*
+!backend/data/raw/.gitkeep
+!backend/data/processed/.gitkeep
+!backend/data/models/.gitkeep
+!backend/data/cache/.gitkeep
+!backend/data/exports/.gitkeep
+!backend/data/logs/.gitkeep
 
 # Logs
 *.log

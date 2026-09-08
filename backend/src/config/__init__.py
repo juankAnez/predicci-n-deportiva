@@ -5,10 +5,16 @@ from typing import Any, List, Optional
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-load_dotenv()
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+load_dotenv(ROOT_DIR / ".env")
 
 
 class Settings(BaseSettings):
+    # Paths
+    ROOT_DIR: Path = ROOT_DIR
+    SRC_DIR: Path = Path(__file__).resolve().parent.parent
+    DATA_DIR: Path = ROOT_DIR / "data"
+
     # Application
     APP_NAME: str = "Predicción Deportiva"
     APP_VERSION: str = "1.0.0"
@@ -27,6 +33,18 @@ class Settings(BaseSettings):
     def model_post_init(self, __context: Any) -> None:
         if not self.DATABASE_URL:
             self.DATABASE_URL = f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        elif self.DATABASE_URL.startswith("sqlite:///"):
+            raw_path = self.DATABASE_URL[len("sqlite:///"):]
+            if not Path(raw_path).is_absolute():
+                cleaned = raw_path.lstrip("./")
+                abs_db_path = (self.ROOT_DIR / cleaned).resolve()
+                self.DATABASE_URL = f"sqlite:///{abs_db_path.as_posix()}"
+
+        for attr in ["ML_MODELS_DIR", "ML_FEATURES_CACHE_DIR", "LOG_FILE"]:
+            val = getattr(self, attr, None)
+            if val and not Path(val).is_absolute():
+                cleaned = val.lstrip("./")
+                setattr(self, attr, str((self.ROOT_DIR / cleaned).resolve()))
 
     # Redis
     REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
@@ -67,16 +85,12 @@ class Settings(BaseSettings):
     FOOTBALL_DATA_API_KEY: Optional[str] = os.getenv("FOOTBALL_DATA_API_KEY")
     WEATHER_API_KEY: Optional[str] = os.getenv("WEATHER_API_KEY")
 
-    # Paths
-    ROOT_DIR: Path = Path(__file__).resolve().parent.parent.parent
-    SRC_DIR: Path = Path(__file__).resolve().parent.parent
-    DATA_DIR: Path = ROOT_DIR / "data"
-
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ROOT_DIR / ".env"),
         case_sensitive=True,
         extra="ignore",
     )
 
 
 settings = Settings()
+
