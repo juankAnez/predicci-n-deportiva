@@ -173,7 +173,34 @@ export const MatchList: React.FC<MatchListProps> = ({
 
             <span className="text-slate-700 hidden sm:inline">|</span>
 
-            {/* Top 5 Leagues */}
+            {/* UEFA Tournaments */}
+            <button
+              onClick={() => onSelectLeague("UCL")}
+              className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                selectedLeague === "UCL"
+                  ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                  : "border border-slate-800 bg-slate-900/80 text-teal-400 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <Trophy className="h-3.5 w-3.5 text-teal-400" />
+              <span>Champions League</span>
+            </button>
+
+            <button
+              onClick={() => onSelectLeague("UEL")}
+              className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                selectedLeague === "UEL"
+                  ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
+                  : "border border-slate-800 bg-slate-900/80 text-amber-400 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <Trophy className="h-3.5 w-3.5 text-amber-400" />
+              <span>Europa League</span>
+            </button>
+
+            <span className="text-slate-700 hidden sm:inline">|</span>
+
+            {/* Top 5 Domestic Leagues */}
             <button
               onClick={() => onSelectLeague("PD")}
               className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
@@ -248,35 +275,11 @@ export const MatchList: React.FC<MatchListProps> = ({
           </div>
         </div>
 
-        {/* Second Row: European Cups & National Cups */}
+        {/* Second Row: National Cups */}
         <div className="flex flex-wrap items-center gap-1.5 pt-1">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mr-1">
-            Copas:
+            Copas Nacionales:
           </span>
-          <button
-            onClick={() => onSelectLeague("UCL")}
-            className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-semibold transition-all ${
-              selectedLeague === "UCL"
-                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
-                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            <Trophy className="h-3 w-3 text-teal-400" />
-            <span>Champions</span>
-          </button>
-
-          <button
-            onClick={() => onSelectLeague("UEL")}
-            className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-semibold transition-all ${
-              selectedLeague === "UEL"
-                ? "bg-teal-500 text-slate-950 font-bold shadow-sm"
-                : "border border-slate-800 bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            <Trophy className="h-3 w-3 text-amber-400" />
-            <span>Europa League</span>
-          </button>
-
           <button
             onClick={() => onSelectLeague("CDR")}
             className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-semibold transition-all ${

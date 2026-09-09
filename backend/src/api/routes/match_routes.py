@@ -49,13 +49,48 @@ DEFAULT_MATCH_ODDS = {
     (64, 67): {"h": 2.15, "d": 3.40, "a": 3.30},  # Monaco vs Lille
     (63, 68): {"h": 1.35, "d": 5.20, "a": 8.50},  # PSG vs Rennes
 
-    # UEFA Champions League (Fase de Liga - J1)
-    (14, 57): {"h": 2.25, "d": 3.60, "a": 3.00},  # Real Madrid vs Bayern
-    (44, 49): {"h": 1.55, "d": 4.20, "a": 5.80},  # Man City vs Inter
-    (50, 28): {"h": 3.50, "d": 3.60, "a": 2.05},  # Milan vs Liverpool
-    (26, 59): {"h": 2.05, "d": 3.50, "a": 3.50},  # Arsenal vs Leverkusen
-    (7, 63):  {"h": 2.30, "d": 3.70, "a": 2.85},  # Barcelona vs PSG
-    (51, 58): {"h": 2.10, "d": 3.40, "a": 3.40},  # Juventus vs Dortmund
+    # UEFA Champions League (Fase de Liga - J1 y J2 Oficiales)
+    # J1 (2026-09-08)
+    (69, 70): {"h": 2.15, "d": 3.30, "a": 3.40},  # AEK Athens vs LASK Linz
+    (71, 30): {"h": 3.60, "d": 3.60, "a": 2.00},  # Club Brugge vs Aston Villa
+    (58, 6):  {"h": 1.75, "d": 3.90, "a": 4.40},  # Dortmund vs Villarreal
+    (72, 44): {"h": 5.50, "d": 4.20, "a": 1.58},  # Porto vs Man City
+    (67, 19): {"h": 2.10, "d": 3.40, "a": 3.50},  # Lille vs Betis
+    (14, 49): {"h": 1.80, "d": 3.80, "a": 4.20},  # Real Madrid vs Inter
+    # J1 (2026-09-09 - HOY)
+    (7, 73):  {"h": 1.30, "d": 5.80, "a": 9.00},  # Barcelona vs Feyenoord
+    (62, 74): {"h": 1.35, "d": 5.20, "a": 8.50},  # Stuttgart vs Viking FK
+    (28, 18): {"h": 1.90, "d": 3.60, "a": 4.00},  # Liverpool vs Ath Madrid
+    (52, 26): {"h": 2.85, "d": 3.40, "a": 2.45},  # Napoli vs Arsenal
+    (63, 75): {"h": 1.12, "d": 9.00, "a": 19.00}, # PSG vs Slovan Bratislava
+    (76, 77): {"h": 1.80, "d": 3.75, "a": 4.30},  # Sporting CP vs Galatasaray
+    # J1 (2026-09-10 - MAÑANA)
+    (78, 53): {"h": 2.60, "d": 3.30, "a": 2.75},  # Fenerbahce vs Roma
+    (79, 80): {"h": 1.70, "d": 3.90, "a": 4.80},  # PSV vs Shakhtar
+    (57, 81): {"h": 1.15, "d": 8.50, "a": 16.00}, # Bayern vs Bodo/Glimt
+    (82, 60): {"h": 3.50, "d": 3.60, "a": 2.05},  # Como vs Leipzig
+    (41, 83): {"h": 1.12, "d": 9.00, "a": 21.00}, # Man United vs Sabah FK
+    (84, 85): {"h": 2.40, "d": 3.30, "a": 2.95},  # Slavia Prague vs Lens
+    # J2 (2026-10-13)
+    (85, 76): {"h": 2.80, "d": 3.40, "a": 2.50},  # Lens vs Sporting CP
+    (83, 84): {"h": 4.50, "d": 3.80, "a": 1.75},  # Sabah vs Slavia Prague
+    (26, 67): {"h": 1.35, "d": 5.20, "a": 8.50},  # Arsenal vs Lille
+    (18, 41): {"h": 2.05, "d": 3.40, "a": 3.60},  # Ath Madrid vs Man United
+    (77, 7):  {"h": 4.60, "d": 4.00, "a": 1.70},  # Galatasaray vs Barcelona
+    (49, 71): {"h": 1.40, "d": 4.80, "a": 7.50},  # Inter vs Club Brugge
+    (60, 79): {"h": 1.85, "d": 3.80, "a": 3.90},  # Leipzig vs PSV
+    (74, 57): {"h": 13.0, "d": 7.00, "a": 1.20},  # Viking vs Bayern
+    (6, 52):  {"h": 2.60, "d": 3.40, "a": 2.70},  # Villarreal vs Napoli
+    # J2 (2026-10-14)
+    (73, 82): {"h": 1.80, "d": 3.70, "a": 4.30},  # Feyenoord vs Como
+    (70, 28): {"h": 9.50, "d": 6.00, "a": 1.28},  # LASK vs Liverpool
+    (53, 14): {"h": 3.40, "d": 3.60, "a": 2.10},  # Roma vs Real Madrid
+    (30, 78): {"h": 1.70, "d": 3.80, "a": 4.80},  # Aston Villa vs Fenerbahce
+    (81, 58): {"h": 4.50, "d": 4.00, "a": 1.72},  # Bodo/Glimt vs Dortmund
+    (44, 63): {"h": 1.90, "d": 3.80, "a": 3.75},  # Man City vs PSG
+    (19, 72): {"h": 2.35, "d": 3.40, "a": 3.00},  # Betis vs Porto
+    (80, 69): {"h": 1.95, "d": 3.50, "a": 3.80},  # Shakhtar vs AEK Athens
+    (75, 62): {"h": 6.00, "d": 4.50, "a": 1.50},  # Slovan Bratislava vs Stuttgart
 
     # UEFA Europa League (Jornada 1)
     (35, 53): {"h": 2.00, "d": 3.40, "a": 3.70},  # Tottenham vs Roma
@@ -172,19 +207,18 @@ def list_matches():
         matches = [m for m in matches if m.match_date and m.match_date <= date.fromisoformat(date_to)]
 
     if status == "upcoming":
-        matches = [m for m in matches if not m.is_finished and m.match_date and m.match_date >= date.today()]
+        matches = [m for m in matches if not m.is_finished]
         matches.sort(key=lambda m: (m.match_date or date.max, str(m.match_time or "")))
     elif status == "finished":
         matches = [m for m in matches if m.is_finished]
         matches.sort(key=lambda m: m.match_date or date.min, reverse=True)
     else:
         # Combined: upcoming first (sorted ascending), then finished (sorted descending)
-        upcoming_matches = [m for m in matches if not m.is_finished and m.match_date and m.match_date >= date.today()]
+        upcoming_matches = [m for m in matches if not m.is_finished]
         upcoming_matches.sort(key=lambda m: (m.match_date or date.max, str(m.match_time or "")))
         finished_matches = [m for m in matches if m.is_finished]
         finished_matches.sort(key=lambda m: m.match_date or date.min, reverse=True)
-        other_matches = [m for m in matches if not m.is_finished and (not m.match_date or m.match_date < date.today())]
-        matches = upcoming_matches + finished_matches + other_matches
+        matches = upcoming_matches + finished_matches
 
     total = len(matches)
     start = (page - 1) * per_page

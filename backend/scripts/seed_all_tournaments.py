@@ -180,6 +180,18 @@ def run_seed():
         print(f"[{cid:2d}] {cname:<24}: Total = {total:4d} | Próximos = {upcoming or 0:2d}")
 
     con.close()
+    
+    # Sincronizar partidos auténticos de UEFA Champions League
+    try:
+        try:
+            from scripts.sync_real_ucl import sync_ucl
+        except ModuleNotFoundError:
+            import sys
+            sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+            from scripts.sync_real_ucl import sync_ucl
+        sync_ucl()
+    except Exception as e:
+        print(f"Aviso: sync_ucl no pudo ejecutarse: {e}")
 
 if __name__ == "__main__":
     run_seed()
