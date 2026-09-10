@@ -372,3 +372,17 @@ def update_match_result(match_id: int):
         },
     })
 
+
+@match_bp.route("/sync", methods=["POST", "GET"])
+def sync_live_matches():
+    """
+    Sincroniza en vivo los marcadores finalizados y nuevos partidos desde ESPN API.
+    """
+    from src.application.services.live_sync_service import LiveSyncService
+    days_back = request.args.get("days_back", 3, type=int)
+    days_ahead = request.args.get("days_ahead", 4, type=int)
+    service = LiveSyncService()
+    result = service.sync_all(days_back=days_back, days_ahead=days_ahead)
+    return jsonify(result)
+
+

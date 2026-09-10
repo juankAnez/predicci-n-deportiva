@@ -12,6 +12,7 @@ import {
   Globe,
   Shield,
   Trophy,
+  RefreshCw,
 } from "lucide-react";
 import type { Match } from "../types/api";
 
@@ -28,6 +29,9 @@ interface MatchListProps {
   onPageChange: (newPage: number) => void;
   onSelectMatch: (match: Match) => void;
   selectedMatchId?: number;
+  onSyncLive?: () => void;
+  isSyncing?: boolean;
+  syncStatusMsg?: string | null;
 }
 
 export const MatchList: React.FC<MatchListProps> = ({
@@ -43,6 +47,9 @@ export const MatchList: React.FC<MatchListProps> = ({
   onPageChange,
   onSelectMatch,
   selectedMatchId,
+  onSyncLive,
+  isSyncing = false,
+  syncStatusMsg = null,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -149,11 +156,35 @@ export const MatchList: React.FC<MatchListProps> = ({
           </button>
         </div>
 
-        <span className="text-xs text-slate-400 font-medium">
-          {totalMatches.toLocaleString()}{" "}
-          {statusFilter === "upcoming" ? "partidos activos" : "partidos en archivo"}
-        </span>
+        <div className="flex items-center gap-2">
+          {onSyncLive && (
+            <button
+              onClick={onSyncLive}
+              disabled={isSyncing}
+              className="flex items-center gap-1.5 rounded-lg border border-teal-500/30 bg-teal-500/10 px-3 py-1.5 text-xs font-semibold text-teal-300 hover:bg-teal-500/20 transition-all disabled:opacity-50"
+              title="Sincronizar resultados oficiales y próximos partidos desde ESPN"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? "animate-spin text-teal-400" : "text-teal-400"}`} />
+              <span>{isSyncing ? "Sincronizando..." : "Actualizar en Vivo"}</span>
+            </button>
+          )}
+
+          <span className="text-xs text-slate-400 font-medium hidden sm:inline">
+            {totalMatches.toLocaleString()}{" "}
+            {statusFilter === "upcoming" ? "partidos activos" : "partidos en archivo"}
+          </span>
+        </div>
       </div>
+
+      {/* Sync Notification Banner */}
+      {syncStatusMsg && (
+        <div className="rounded-xl border border-teal-500/40 bg-teal-500/10 px-3.5 py-2 text-xs font-medium text-teal-200 flex items-center justify-between animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
+            <span>{syncStatusMsg}</span>
+          </div>
+        </div>
+      )}
 
       {/* European Leagues & Tournaments Selector */}
       <div className="space-y-2">

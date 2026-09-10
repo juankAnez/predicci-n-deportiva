@@ -96,6 +96,13 @@ def create_app() -> Flask:
 from src.infrastructure.database import init_db
 init_db()
 
+# Auto-sincronización en segundo plano de partidos finalizados y próximos
+try:
+    from src.application.services.live_sync_service import start_background_sync
+    start_background_sync(interval_seconds=1800)
+except Exception as _sync_err:
+    logging.warning(f"No se pudo iniciar sincronización en vivo automática: {_sync_err}")
+
 app = create_app()
 
 if __name__ == "__main__":

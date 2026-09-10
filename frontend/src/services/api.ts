@@ -166,3 +166,15 @@ export async function checkBackendHealth(): Promise<boolean> {
     return false;
   }
 }
+
+export async function syncLiveMatches(): Promise<{
+  status: string;
+  scores_updated: number;
+  matches_created: number;
+  events_processed: number;
+}> {
+  const res = await fetch(`${API_BASE_URL}/matches/sync`, { method: 'POST' });
+  if (!res.ok) throw new Error('Error al sincronizar resultados');
+  return res.json();
+}
+

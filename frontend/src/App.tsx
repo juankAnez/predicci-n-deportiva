@@ -15,6 +15,7 @@ import {
   simulateMatch,
   fetchModels,
   checkBackendHealth,
+  syncLiveMatches,
 } from "./services/api";
 import type {
   OverviewStats,
@@ -56,6 +57,10 @@ export const App: React.FC = () => {
     a: 3.30,
   });
 
+  // Live Sync States
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [syncStatusMsg, setSyncStatusMsg] = useState<string | null>(null);
+
   // Initial Load
   useEffect(() => {
     const initializeData = async () => {
@@ -72,6 +77,21 @@ export const App: React.FC = () => {
         if (overviewData) setOverview(overviewData);
         if (teamsData) setTeams(teamsData);
         if (modelsData) setModels(modelsData);
+
+        // Auto-sincronización en vivo silenciosa al abrir la aplicación
+        syncLiveMatches()
+          .then((syncRes) => {
+            if (syncRes && syncRes.scores_updated > 0) {
+              fetchMatches(currentPage, 12, selectedLeague, undefined, statusFilter)
+                .then((mRes) => {
+                  setMatches(mRes.data);
+                  setTotalPages(mRes.pagination.pages);
+                  setTotalMatches(mRes.pagination.total);
+                })
+                .catch(() => {});
+            }
+          })
+          .catch(() => {});
       } catch (err) {
         console.error("Error cargando datos iniciales:", err);
       } finally {
@@ -155,6 +175,34 @@ export const App: React.FC = () => {
     }
   };
 
+  // Live Results Synchronization
+  const handleSyncLive = async () => {
+    setIsSyncing(true);
+    setSyncStatusMsg("Sincronizando partidos y resultados oficiales desde ESPN...");
+    try {
+      const res = await syncLiveMatches();
+      const updated = res.scores_updated || 0;
+      const created = res.matches_created || 0;
+      setSyncStatusMsg(
+        `✓ Sincronización exitosa: ${updated} resultados actualizados, ${created} nuevos partidos registrados.`
+      );
+      // Reload current matches view
+      const matchesRes = await fetchMatches(currentPage, 12, selectedLeague, undefined, statusFilter);
+      setMatches(matchesRes.data);
+      setTotalPages(matchesRes.pagination.pages);
+      setTotalMatches(matchesRes.pagination.total);
+      if (matchesRes.data.length > 0) {
+        handleSelectMatch(matchesRes.data[0]);
+      }
+    } catch (err) {
+      console.error("Error en sincronización en vivo:", err);
+      setSyncStatusMsg("Aviso: No se pudo conectar a la API externa de resultados.");
+    } finally {
+      setIsSyncing(false);
+      setTimeout(() => setSyncStatusMsg(null), 5000);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#030712] text-slate-100 selection:bg-teal-500 selection:text-slate-950">
       {/* Navigation */}
@@ -217,6 +265,9 @@ export const App: React.FC = () => {
                   onPageChange={(page) => setCurrentPage(page)}
                   onSelectMatch={handleSelectMatch}
                   selectedMatchId={selectedMatch?.id}
+                  onSyncLive={handleSyncLive}
+                  isSyncing={isSyncing}
+                  syncStatusMsg={syncStatusMsg}
                 />
               </div>
 
